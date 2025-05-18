@@ -1,0 +1,274 @@
+{% extends 'base.html' %} {% load static %}
+
+<!-- Styles -->
+{% block page_styles %}
+<style>
+  .bootstrap-select button.dropdown-toggle {
+    background: none;
+  }
+
+  .flatpickr-wrapper {
+    display: block !important;
+  }
+</style>
+{% endblock page_styles %}
+
+<!-- Page Skripts -->
+{% block page_scripts %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const wizardNumbered = document.querySelector(".reportWizard"),
+      wizardNumberedBtnNextList = [].slice.call(wizardNumbered.querySelectorAll(".btn-next")),
+      wizardNumberedBtnPrevList = [].slice.call(wizardNumbered.querySelectorAll(".btn-prev")),
+      wizardNumberedBtnSubmit = wizardNumbered.querySelector(".btn-submit");
+
+    if (typeof wizardNumbered !== undefined && wizardNumbered !== null) {
+      const numberedStepper = new Stepper(wizardNumbered, {
+        linear: false,
+      });
+      if (wizardNumberedBtnNextList) {
+        wizardNumberedBtnNextList.forEach((wizardNumberedBtnNext) => {
+          wizardNumberedBtnNext.addEventListener("click", (event) => {
+            numberedStepper.next();
+          });
+        });
+      }
+      if (wizardNumberedBtnPrevList) {
+        wizardNumberedBtnPrevList.forEach((wizardNumberedBtnPrev) => {
+          wizardNumberedBtnPrev.addEventListener("click", (event) => {
+            numberedStepper.previous();
+          });
+        });
+      }
+      if (wizardNumberedBtnSubmit) {
+        wizardNumberedBtnSubmit.addEventListener("click", (event) => {
+          alert("Submitted..!!");
+        });
+      }
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var flatpickrDateTime = document.querySelector("#flatpickr-datetime");
+
+    flatpickrDateTime.flatpickr({
+      enableTime: true,
+      dateFormat: "d.m.Y H:i",
+      static: false,
+      locale: "de",
+      time_24hr: true,
+    });
+  });
+</script>
+
+<!-- Remove form-check-input from multiple select  -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var formCheckInputs = document.querySelectorAll("div > div.form-check-input");
+
+    formCheckInputs.forEach((element) => {
+      element.classList.remove("form-check-input");
+    });
+  });
+</script>
+
+{% endblock page_scripts %}
+
+<!-- tab titles -->
+{% block tab_title %}Aufträge{% endblock tab_title %}
+
+<!-- Content -->
+{% block content %}
+
+<div class="bs-stepper reportWizard mt-6">
+  <!-- wizard navigation -->
+  <div class="bs-stepper-header">
+    <!-- wizard step -->
+    <div class="step" data-target="#basicData">
+      <button type="button" class="step-trigger">
+        <span class="bs-stepper-circle">1</span>
+        <span class="bs-stepper-label">
+          <span class="bs-stepper-title">Basisdaten</span>
+          <span class="bs-stepper-subtitle">Setup Account Details</span>
+        </span>
+      </button>
+    </div>
+    <!-- / wizard step -->
+
+    <div class="line">
+      <i class="icon-base bx bx-chevron-right scaleX-n1-rtl"></i>
+    </div>
+
+    <!-- wizard step -->
+    <div class="step" data-target="#details">
+      <button type="button" class="step-trigger">
+        <span class="bs-stepper-circle">2</span>
+        <span class="bs-stepper-label">
+          <span class="bs-stepper-title">Details</span>
+          <span class="bs-stepper-subtitle">Add personal info</span>
+        </span>
+      </button>
+    </div>
+    <!-- / wizard step -->
+
+    <div class="line">
+      <i class="icon-base bx bx-chevron-right scaleX-n1-rtl"></i>
+    </div>
+
+    <!-- wizard step -->
+    <div class="step" data-target="#accidentCause">
+      <button type="button" class="step-trigger">
+        <span class="bs-stepper-circle">3</span>
+        <span class="bs-stepper-label">
+          <span class="bs-stepper-title">Unfallhergang</span>
+          <span class="bs-stepper-subtitle">Add social links</span>
+        </span>
+      </button>
+    </div>
+    <!-- / wizard step -->
+  </div>
+  <!-- / wizard navigation -->
+
+  <!-- wizard content -->
+  <div class="bs-stepper-content">
+    <!-- form -->
+    <form onSubmit="return false">
+      <!-- Step 1 -->
+      <div id="basicData" class="content">
+        <!-- step header -->
+        <div class="content-header mb-4">
+          <h6 class="mb-0">Basisdaten</h6>
+          <small>Enter Your Account Details.</small>
+        </div>
+        <!-- / step header -->
+
+        <!-- form fields -->
+        <div class="row g-3">
+          {% for field in report_form_step_1 %}
+          <!-- field -->
+          <div class="col-sm-6">
+            <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
+            {{field}}
+          </div>
+          {% endfor %}
+
+          <!-- step buttons -->
+          <div class="col-12 d-flex justify-content-between">
+            <button class="btn btn-secondary btn-prev" disabled>
+              <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
+              <span class="align-middle d-sm-inline-block d-none">Previous</span>
+            </button>
+            <button class="btn btn-primary btn-next">
+              <span class="align-middle d-sm-inline-block d-none me-sm-2">Next</span>
+              <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
+            </button>
+          </div>
+          <!-- / step buttons -->
+        </div>
+        <!-- / form fields -->
+      </div>
+      <!-- / Step 1 -->
+
+      <!-- Step 2 -->
+      <div id="details" class="content">
+        <!-- step header -->
+        <div class="content-header mb-4">
+          <h6 class="mb-0">Details</h6>
+          <small>Enter Your Account Details.</small>
+        </div>
+        <!-- / step header -->
+
+        <!-- form fields -->
+        <div class="row g-3">
+          {% for field in report_form_step_2 %}
+
+          <!-- if checkbox test -->
+          {% if field.widget_type == "checkbox" %}
+          <div class="col-sm-12 d-flex align-items-center gap-2">
+            {{field}}
+            <label class="form-label m-0" for="id_{{field.name}}">{{field.label}}</label>
+          </div>
+          {% else %}
+          <!-- field -->
+          <div class="col-sm-6">
+            <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
+            {{field}}
+          </div>
+          {% endif %}
+          <!-- endif checkbox test -->
+
+          {% endfor %}
+
+          <!-- step buttons -->
+          <div class="col-12 d-flex justify-content-between">
+            <button class="btn btn-secondary btn-prev" disabled>
+              <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
+              <span class="align-middle d-sm-inline-block d-none">Previous</span>
+            </button>
+            <button class="btn btn-primary btn-next">
+              <span class="align-middle d-sm-inline-block d-none me-sm-2">Next</span>
+              <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
+            </button>
+          </div>
+          <!-- / step buttons -->
+        </div>
+        <!-- / form fields -->
+      </div>
+      <!-- / Step 2 -->
+
+      <!-- Step 3 -->
+      <div id="accidentCause" class="content">
+        <!-- step header -->
+        <div class="content-header mb-4">
+          <h6 class="mb-0">Unfallhergang</h6>
+          <small>Enter Your Account Details.</small>
+        </div>
+        <!-- / step header -->
+
+        <!-- form fields -->
+        <div class="row g-3">
+          {% for field in report_form_step_3 %}
+
+          <!-- if checkbox test -->
+          {% if field.widget_type == "checkbox" %}
+          <div class="col-sm-12 d-flex align-items-center gap-2">
+            {{field}}
+            <label class="form-label m-0" for="id_{{field.name}}">{{field.label}}</label>
+          </div>
+          {% else %}
+          <!-- field -->
+          <div class="col-sm-6">
+            <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
+            {{field}}
+          </div>
+          {% endif %}
+          <!-- endif checkbox test -->
+
+          {% endfor %}
+
+          <!-- step buttons -->
+          <div class="col-12 d-flex justify-content-between">
+            <button class="btn btn-secondary btn-prev" disabled>
+              <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
+              <span class="align-middle d-sm-inline-block d-none">Previous</span>
+            </button>
+            <button class="btn btn-primary btn-next">
+              <span class="align-middle d-sm-inline-block d-none me-sm-2">Next</span>
+              <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
+            </button>
+          </div>
+          <!-- / step buttons -->
+        </div>
+        <!-- / form fields -->
+      </div>
+      <!-- / Step 3 -->
+    </form>
+    <!--  -->
+  </div>
+  <!-- wizard content -->
+</div>
+
+{% endblock content %}

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crash Report - Digitale Schadenserfassung für Werkstätten</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#0066CC",
+              secondary: "#00A3E0",
+            },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+
+      :where([class^="ri-"])::before {
+        content: "\f3c2";
+      }
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <nav class="fixed w-full bg-white/95 backdrop-blur z-50 border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <span class="text-2xl font-['Pacifico'] text-primary">Crash Report</span>
+          </div>
+          <div class="hidden md:flex items-center space-x-8">
+            <a href="#features" class="text-gray-700 hover:text-primary">Funktionen</a>
+            <a href="#process" class="text-gray-700 hover:text-primary">Prozess</a>
+            <a href="#pricing" class="text-gray-700 hover:text-primary">Preise</a>
+            <button class="bg-primary text-white px-6 py-2 !rounded-button hover:bg-primary/90">Kostenlos nutzen</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <section class="pt-32 pb-20 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent z-10"></div>
+      <div class="absolute inset-0">
+        <img
+          src="https://public.readdy.ai/ai/img_res/6ddf954519fcc768b3d393f53e4d7f57.jpg"
+          class="w-full h-full object-cover animate-fade-in"
+          alt="Hero Background"
+        />
+      </div>
+      <div class="absolute inset-0 z-0">
+        <div class="floating-circles">
+          <div class="circle"></div>
+          <div class="circle"></div>
+          <div class="circle"></div>
+          <div class="circle"></div>
+          <div class="circle"></div>
+        </div>
+      </div>
+      <style>
+        .floating-circles {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+        .circle {
+          position: absolute;
+          background: linear-gradient(45deg, rgba(0, 102, 204, 0.1), rgba(0, 163, 224, 0.1));
+          border-radius: 50%;
+          animation: float 15s infinite linear;
+        }
+        .circle:nth-child(1) {
+          width: 300px;
+          height: 300px;
+          left: -150px;
+          top: 10%;
+          animation-delay: 0s;
+        }
+        .circle:nth-child(2) {
+          width: 400px;
+          height: 400px;
+          right: -200px;
+          top: 20%;
+          animation-delay: -3s;
+        }
+        .circle:nth-child(3) {
+          width: 200px;
+          height: 200px;
+          left: 30%;
+          bottom: -100px;
+          animation-delay: -6s;
+        }
+        .circle:nth-child(4) {
+          width: 250px;
+          height: 250px;
+          right: 25%;
+          top: -125px;
+          animation-delay: -9s;
+        }
+        .circle:nth-child(5) {
+          width: 350px;
+          height: 350px;
+          left: 40%;
+          top: 40%;
+          animation-delay: -12s;
+        }
+        @keyframes float {
+          0% {
+            transform: rotate(0deg) translate(50px) rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg) translate(50px) rotate(-360deg);
+          }
+        }
+      </style>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div class="animate-slide-up">
+            <span class="inline-block text-primary font-semibold mb-4 tracking-wider text-sm uppercase animate-pulse"
+              >Crash Report</span
+            >
+            <h1 class="text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Digitale Schadenserfassung für Ihre Werkstatt
+            </h1>
+            <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+              Erfassen Sie Schadensfälle in wenigen Minuten digital und übermitteln Sie diese effizient und sicher direkt an
+              den Gutachter.
+            </p>
+            <div class="flex gap-4">
+              <button
+                class="bg-primary text-white px-8 py-4 !rounded-button text-lg hover:bg-primary/90 whitespace-nowrap transform transition hover:scale-105"
+              >
+                Dauerhaft kostenlos nutzen
+              </button>
+              <button
+                class="border border-gray-300 px-8 py-4 !rounded-button text-lg hover:bg-gray-50 whitespace-nowrap transform transition hover:scale-105"
+              >
+                <i class="ri-play-circle-line mr-2"></i>Demo ansehen
+              </button>
+            </div>
+            <div class="mt-8 flex items-center gap-4">
+              <div class="flex -space-x-2">
+                <img
+                  src="https://public.readdy.ai/ai/img_res/5bdd8a15937c7dad0f72b77cec79665a.jpg"
+                  class="w-10 h-10 rounded-full border-2 border-white"
+                  alt="User"
+                />
+                <img
+                  src="https://public.readdy.ai/ai/img_res/0746a603eb74fc9a0aa32f199263d59b.jpg"
+                  class="w-10 h-10 rounded-full border-2 border-white"
+                  alt="User"
+                />
+                <img
+                  src="https://public.readdy.ai/ai/img_res/d6a0d33c51a803ccf871a23692daf8f5.jpg"
+                  class="w-10 h-10 rounded-full border-2 border-white"
+                  alt="User"
+                />
+              </div>
+              <span class="text-sm text-gray-600"
+                >Bereits von über
+                <span class="font-semibold">150+ Werkstätten</span>
+                genutzt</span
+              >
+            </div>
+          </div>
+          <div class="relative animate-slide-up" style="animation-delay: 200ms">
+            <div class="absolute -right-4 -top-4 bg-blue-50 w-full h-full rounded-xl transform rotate-3"></div>
+            <img
+              src="https://public.readdy.ai/ai/img_res/d7f6227c86018ee7b3ad9e3125042ae7.jpg"
+              class="rounded-xl shadow-2xl relative transform transition hover:scale-105 hover:rotate-1"
+              alt="Dashboard Preview"
+            />
+            <div
+              class="absolute -left-8 bottom-8 bg-white p-4 rounded-lg shadow-lg flex items-center gap-4 animate-bounce-slow"
+            >
+              <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <i class="ri-timer-line text-green-600 text-2xl"></i>
+              </div>
+              <div>
+                <p class="font-semibold">Zeitsparend</p>
+                <p class="text-sm text-gray-600">5x schneller als manuell</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <style>
+      @keyframes bounce-slow {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes slide-up {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .animate-bounce-slow {
+        animation: bounce-slow 3s infinite;
+      }
+      .animate-fade-in {
+        animation: fade-in 1s ease-out;
+      }
+      .animate-slide-up {
+        animation: slide-up 1s ease-out;
+      }
+
+      #pricing div.rounded-xl {
+        height: fit-content;
+      }
+    </style>
+    <section class="py-20 bg-gradient-to-b from-gray-50 to-white" id="features">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <span class="inline-block text-primary font-semibold mb-4 tracking-wider text-sm uppercase">Key Features</span>
+          <h2 class="text-4xl font-bold text-gray-900 mb-4">Ihre Vorteile mit Crash Report</h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Digitalisieren Sie Ihre Schadenserfassung und optimieren Sie Ihren gesamten Workflow
+          </p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-1">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+              <i class="ri-file-list-3-line text-primary text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-4">Digitale Schadenserfassung</h3>
+            <ul class="space-y-3 text-gray-600">
+              <li class="flex items-start">
+                <i class="ri-check-line text-primary mr-2 mt-1"></i>
+                <span>Geführte Eingabemaske für alle relevanten Kundendaten</span>
+              </li>
+              <li class="flex items-start">
+                <i class="ri-check-line text-primary mr-2 mt-1"></i>
+                <span>Direkter Upload von Schadensbildern nach Versicherungsanforderungen</span>
+              </li>
+              <li class="flex items-start">
+                <i class="ri-check-line text-primary mr-2 mt-1"></i>
+                <span>Erfassung in wenigen Minuten</span>
+              </li>
+            </ul>
+          </div>
+          <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-1">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+              <i class="ri-file-paper-2-line text-primary text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-4">Rechtskonforme Dokumentation</h3>
+            <ul class="space-y-3 text-gray-600">
+              <li class="flex items-start">
+                <i class="ri-check-line text-primary mr-2 mt-1"></i>
+                <span>Digitale Erfassung von Vollmachten & Abtretungserklärungen</span>
+              </li>
+              <li class="flex items-start">
+                <i class="ri-check-line text-primary mr-2 mt-1"></i>
+                <span>Elektronische Unterschrift direkt in der App</span>
+              </li>
+              <li class="flex items-start">
+                <i class="ri-check-line text-primary mr-2 mt-1"></i>
+                <span>DSGVO-konforme Datenspeicherung</span>
+              </li>
+            </ul>
+          </div>
+          <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-1">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+              <i class="ri-flow-chart-line text-primary text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-4">Optimierter Workflow</h3>
+            <ul class="space-y-3 text-gray-600">
+              <li class="flex items-start">
+                <i class="ri-check-line text-primary mr-2 mt-1"></i>
+                <span>Direkte Anbindung an Gutachter</span>
+              </li>
+              <li class="flex items-start">
+                <i class="ri-check-line text-primary mr-2 mt-1"></i>
+                <span>Keine doppelte Dateneingabe</span>
+              </li>
+              <li class="flex items-start">
+                <i class="ri-check-line text-primary mr-2 mt-1"></i>
+                <span>Mobiler Zugriff von überall</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8 mt-12">
+          <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-lg transition-all">
+            <div class="flex items-start">
+              <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mr-6">
+                <i class="ri-shield-check-line text-primary text-3xl"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold mb-3">Sichere Cloud-Lösung</h3>
+                <ul class="space-y-2 text-gray-600">
+                  <li class="flex items-center">
+                    <i class="ri-check-line text-primary mr-2"></i>
+                    <span>Verschlüsselte Datenübertragung</span>
+                  </li>
+                  <li class="flex items-center">
+                    <i class="ri-check-line text-primary mr-2"></i>
+                    <span>Hosting auf deutschen Servern</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-lg transition-all">
+            <div class="flex items-start">
+              <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mr-6">
+                <i class="ri-customer-service-2-line text-primary text-3xl"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold mb-3">Umfassender Support</h3>
+                <ul class="space-y-2 text-gray-600">
+                  <li class="flex items-center">
+                    <i class="ri-check-line text-primary mr-2"></i>
+                    <span>Online Einweisung durch Videos und Tutorials</span>
+                  </li>
+                  <li class="flex items-center">
+                    <i class="ri-check-line text-primary mr-2"></i>
+                    <span>Technischer Support & Updates</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="py-20" id="process">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">So einfach funktioniert's</h2>
+          <p class="text-xl text-gray-600">In nur drei Schritten zum digitalen Schadensbericht</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="relative">
+            <div class="bg-white p-8 rounded-xl shadow-sm relative z-10">
+              <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center mb-6">1</div>
+              <h3 class="text-xl font-semibold mb-4">Daten erfassen</h3>
+              <p class="text-gray-600">Geben Sie die Schadens- und Fahrzeugdaten in unserer intuitiven Oberfläche ein.</p>
+            </div>
+            <div class="absolute top-1/2 left-full w-24 border-t-2 border-dashed border-gray-300 hidden md:block"></div>
+          </div>
+          <div class="relative">
+            <div class="bg-white p-8 rounded-xl shadow-sm relative z-10">
+              <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center mb-6">2</div>
+              <h3 class="text-xl font-semibold mb-4">Fotos hochladen</h3>
+              <p class="text-gray-600">Laden Sie relevante Schadensbilder direkt über die App hoch.</p>
+            </div>
+            <div class="absolute top-1/2 left-full w-24 border-t-2 border-dashed border-gray-300 hidden md:block"></div>
+          </div>
+          <div class="relative">
+            <div class="bg-white p-8 rounded-xl shadow-sm relative z-10">
+              <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center mb-6">3</div>
+              <h3 class="text-xl font-semibold mb-4">Absenden</h3>
+              <p class="text-gray-600">Ein Klick genügt und alle Daten werden sicher an den Gutachter übermittelt</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="py-20 bg-gray-50" id="pricing">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold text-gray-900 mb-4">Alles inklusive - komplett kostenfrei für Sie!</h2>
+          <p class="text-xl text-gray-600">Ein Komplettpaket ohne versteckte Kosten</p>
+          <div class="inline-flex items-center gap-2 mt-6 bg-primary/10 px-6 py-3 rounded-full">
+            <i class="ri-gift-line text-primary text-xl"></i>
+            <span class="font-semibold text-primary">Alle Funktionen sind dauerhaft kostenlos</span>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div
+            class="bg-white p-8 rounded-xl shadow-lg border-2 border-primary relative transform hover:scale-105 transition-all"
+          >
+            <div class="absolute -top-4 right-8 bg-primary text-white px-4 py-1 rounded-full text-sm">Inklusive</div>
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+              <i class="ri-tablet-line text-primary text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-4">Hardware</h3>
+            <p class="text-gray-600 mb-6">
+              Tablets für die mobile Schadenserfassung werden von uns kostenfrei zur Verfügung gestellt
+            </p>
+            <ul class="space-y-4">
+              <li class="flex items-center text-primary"><i class="ri-check-line mr-2"></i>Hochwertige Tablets</li>
+              <li class="flex items-center text-primary"><i class="ri-check-line mr-2"></i>Vorinstallierte Software</li>
+              <li class="flex items-center text-primary"><i class="ri-check-line mr-2"></i>Regelmäßige Updates</li>
+            </ul>
+            <div class="mt-6 pt-6 border-t border-gray-100">
+              <p class="text-center font-semibold text-primary">0€ / Monat</p>
+            </div>
+          </div>
+          <div
+            class="bg-white p-8 rounded-xl shadow-lg border-2 border-primary relative transform hover:scale-105 transition-all"
+          >
+            <div class="absolute -top-4 right-8 bg-primary text-white px-4 py-1 rounded-full text-sm">Inklusive</div>
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+              <i class="ri-customer-service-2-line text-primary text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-4">Support & Schulung</h3>
+            <p class="text-gray-600 mb-6">Umfassende Einweisung und kontinuierliche Unterstützung für Ihr Team</p>
+            <ul class="space-y-4">
+              <li class="flex items-center text-primary"><i class="ri-check-line mr-2"></i>Online-Schulung</li>
+              <li class="flex items-center text-primary"><i class="ri-check-line mr-2"></i>Technischer Support</li>
+              <li class="flex items-center text-primary"><i class="ri-check-line mr-2"></i>Regelmäßige Updates</li>
+              <li class="flex items-center text-primary"><i class="ri-check-line mr-2"></i>Persönlicher Ansprechpartner</li>
+            </ul>
+            <div class="mt-6 pt-6 border-t border-gray-100">
+              <p class="text-center font-semibold text-primary">0€ / Monat</p>
+            </div>
+          </div>
+          <div
+            class="bg-white p-8 rounded-xl shadow-lg border-2 border-primary relative transform hover:scale-105 transition-all"
+          >
+            <div class="absolute -top-4 right-8 bg-primary text-white px-4 py-1 rounded-full text-sm">Inklusive</div>
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+              <i class="ri-shield-check-line text-primary text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-4">Sicherheit & Compliance</h3>
+            <p class="text-gray-600 mb-6">Höchste Standards für Ihre Daten und rechtliche Sicherheit</p>
+            <ul class="space-y-4">
+              <li class="flex items-center text-primary"><i class="ri-check-line mr-2"></i>DSGVO-konform</li>
+              <li class="flex items-center text-primary"><i class="ri-check-line mr-2"></i>Verschlüsselte Übertragung</li>
+              <li class="flex items-center text-primary"><i class="ri-check-line mr-2"></i>Sichere Cloud-Lösung</li>
+            </ul>
+            <div class="mt-6 pt-6 border-t border-gray-100">
+              <p class="text-center font-semibold text-primary">0€ / Monat</p>
+            </div>
+          </div>
+        </div>
+        <div class="text-center mt-12">
+          <button
+            class="bg-primary text-white px-12 py-4 !rounded-button text-xl font-semibold hover:bg-primary/90 transform transition hover:scale-105 shadow-lg"
+          >
+            Jetzt kostenfrei nutzen
+          </button>
+        </div>
+      </div>
+    </section>
+    <section class="py-20 bg-gray-900 text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl font-bold mb-8">Starten Sie jetzt - komplett kostenfrei!</h2>
+        <p class="text-xl mb-8">Keine versteckten Kosten, keine Kreditkarte erforderlich - für immer kostenlos</p>
+        <button
+          class="bg-white text-gray-900 px-12 py-5 !rounded-button text-xl font-semibold hover:bg-gray-100 transform transition hover:scale-105 shadow-lg"
+        >
+          Dauerhaft kostenlos nutzen
+        </button>
+      </div>
+    </section>
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-4 gap-8">
+          <div>
+            <span class="text-2xl font-['Pacifico'] mb-4 block">Crash Report</span>
+            <p class="text-gray-400">Ihre digitale Lösung für effizientes Schadensmanagement</p>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Produkt</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li><a href="#features">Funktionen</a></li>
+              <li><a href="#pricing">Preise</a></li>
+              <li><a href="#process">Prozess</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Rechtliches</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li><a href="#">Impressum</a></li>
+              <li><a href="#">Datenschutz</a></li>
+              <li><a href="#">AGB</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Newsletter</h4>
+            <form class="space-y-4">
+              <input
+                type="email"
+                placeholder="Ihre E-Mail Adresse"
+                class="w-full px-4 py-2 rounded bg-gray-800 border-none text-white"
+                required
+              />
+              <button type="submit" class="w-full bg-primary text-white px-4 py-2 !rounded-button hover:bg-primary/90">
+                Abonnieren
+              </button>
+            </form>
+          </div>
+        </div>
+        <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+          <p>&copy; 2025 Crash Report. Alle Rechte vorbehalten.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

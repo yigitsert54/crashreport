@@ -1,0 +1,70 @@
+<!-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX -->
+
+{% extends 'base.html' %} {% load static %}
+
+<!-- Styles -->
+{% block page_styles %} {% endblock page_styles %}
+
+<!-- Page Skripts -->
+{% block page_scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("Hello");
+  });
+</script>
+{% endblock page_scripts %}
+
+<!-- tab titles -->
+{% block tab_title %}Aufträge{% endblock tab_title %}
+
+<!-- Content -->
+{% block content %}
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="card-title mb-0">
+          <h5 class="mb-1 me-2">Aufträge</h5>
+          <p class="card-subtitle">Hier können Sie Ihre Aufträge einsehen</p>
+        </div>
+        <a href="{% url 'create_report_initial' %}" class="btn btn-label-primary">Auftrag anlegen</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Kundenname</th>
+              <th>Unfalldatum</th>
+              <th>Kennzeichen</th>
+              <th>Schadensnummer</th>
+              <th>Kontaktdaten</th>
+              <th>Status</th>
+              <th>Erstellt am</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            {% for report in reports %}
+            <tr>
+              <td>{{report.first_name}} {{report.last_name}}</td>
+              <td>{{report.accident_date_string}}</td>
+              <td><span class="badge bg-label-secondary">{{report.plate_number}}</span></td>
+              <td>{{report.damage_number}}</td>
+              <td>{{report.phone_number}}</td>
+              <td><span class="badge bg-label-danger">Nicht abgeschickt</span></td>
+              <td class="created-date">14.03.2025</td>
+              <td>
+                <a href="{% url 'edit_report_form' report.id %}" class="btn btn-text-dark">Bearbeiten</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

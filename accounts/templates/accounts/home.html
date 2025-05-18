@@ -1,0 +1,183 @@
+{% extends 'base.html' %} {% load static %}
+
+<!-- Styles -->
+{% block page_styles %}
+
+<style>
+  :root {
+    --lightGrey: #ececec;
+    --borderColor: #e5e7ec;
+    --headerBg: #ffffff;
+    --footerBg: #f9f9fb;
+  }
+
+  .table-container {
+    max-width: 1600px;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  thead {
+    background-color: var(--headerBg);
+    border-bottom: 2px solid var(--borderColor);
+  }
+
+  th {
+    text-align: left;
+    padding: 1rem;
+    font-weight: 600;
+    color: var(--mainColor);
+    z-index: 5;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--borderColor);
+    transition: background-color 0.2s;
+  }
+
+  tbody tr:hover {
+    background-color: rgba(245, 247, 250, 0.8);
+  }
+
+  td {
+    padding: 1rem;
+    vertical-align: middle;
+  }
+
+  .plate-number {
+    background: var(--lightGrey);
+    padding: 4px 10px;
+    border-radius: 4px;
+    color: var(--secColor);
+    font-weight: 500;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    display: inline-block;
+  }
+
+  .value.missing {
+    color: #d93025;
+    font-weight: 400;
+  }
+
+  .badge {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .badge.success {
+    color: #0b6e4f;
+    background: #e8f5f0;
+  }
+
+  .badge.warning {
+    color: #c92a2a;
+    background: #fff5f5;
+  }
+
+  .created-date {
+    color: var(--secColor);
+    font-size: 0.9rem;
+  }
+
+  table a.edit {
+    background-color: #2d2d3917;
+    text-decoration: none;
+    color: var(--mainColor);
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: 0.25s all ease;
+  }
+
+  table a.edit:hover {
+    background-color: var(--mainColor);
+    color: #fff;
+  }
+
+  @media (max-width: 1200px) {
+    table {
+      font-size: 0.85rem;
+    }
+
+    th,
+    td {
+      padding: 0.75rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    table {
+      display: block;
+      overflow-x: auto;
+    }
+  }
+</style>
+
+{% endblock page_styles %}
+
+<!-- Page Skripts -->
+{% block page_scripts %}
+<script></script>
+{% endblock page_scripts %}
+
+<!-- Content -->
+{% block content %}
+
+<!-- pageTitle Section -->
+<div class="pageTitleSection withAction">
+  <p class="pageTitle">Aufträge</p>
+
+  <div class="actionButtons">
+    <!-- Create new report -->
+    <a href="" class="mainButton newReport">Auftrag anlegen</a>
+    <!-- / Create new report -->
+  </div>
+</div>
+<!-- / pageTitle Section -->
+
+<div class="table-container card">
+  <table>
+    <thead>
+      <tr>
+        <th>Kundenname</th>
+        <th>Unfalldatum</th>
+        <th>Kennzeichen</th>
+        <th>Schadensnummer</th>
+        <th>Kontaktdaten</th>
+        <th>Status</th>
+        <th>Erstellt am</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for report in reports %}
+      <tr>
+        <td><strong>{{report.first_name}} {{report.last_name}}</strong></td>
+        <td>{{report.accident_date_string}}</td>
+        <td><span class="plate-number">{{report.plate_number}}</span></td>
+        <td>{{report.damage_number}}</td>
+        <td>{{report.phone_number}}</td>
+        <td><span class="badge warning">Nicht abgeschickt</span></td>
+        <td class="created-date">14.03.2025</td>
+        <td>
+          <a href="#" class="edit">Bearbeiten</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock content %}

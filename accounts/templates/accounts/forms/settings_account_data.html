@@ -1,0 +1,26 @@
+<!-- account data form -->
+<form method="POST" action="{% url 'edit_account_data' %}">
+  {% csrf_token %}
+
+  <!-- Loop through each field in account_form -->
+  {% for field in account_form %}
+
+  <div class="mb-6">
+    <!-- label -->
+    <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
+
+    <!-- input group -->
+    <div class="input-group input-group-merge">
+      <!-- input icon -->
+      <span class="input-group-text"><i class="bx bx-{{field.field.widget.attrs.icon}}"></i></span>
+
+      <!-- input field -->
+      {{field}}
+    </div>
+  </div>
+
+  {% endfor %}
+
+  <button type="submit" class="btn btn-primary">Speichern</button>
+</form>
+<!-- / account data form -->

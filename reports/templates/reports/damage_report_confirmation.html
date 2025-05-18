@@ -1,0 +1,884 @@
+{% extends 'base.html' %} {% load static %}
+
+<!-- styles -->
+{% block page_styles %}
+<!-- Datepicker -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+
+<!-- summary styles -->
+<style>
+  /* Basis-Layout (ähnlich wie Wizard) */
+  main .formSection {
+    width: 100%;
+    max-width: 700px; /* Behält die maximale Breite bei */
+    box-sizing: border-box;
+  }
+
+  main .formSection .card {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1.8rem 1.5rem; /* Etwas mehr horizontaler Padding */
+  }
+
+  /* === Schritt-Navigation (Identisch zum Wizard) === */
+  .step-navigation {
+    margin-bottom: 2.5rem; /* Mehr Abstand nach der Navigation */
+    border-bottom: 1px solid var(--borderColor, #eee);
+    padding-bottom: 1.5rem;
+  }
+
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+  }
+
+  .step-nav-item {
+    text-align: center;
+    flex-grow: 1;
+    padding: 10px 5px;
+    border-radius: 4px;
+    position: relative;
+    transition: background-color 0.3s ease;
+  }
+
+  .step-nav-item .step-number {
+    display: block;
+    font-weight: bold;
+    font-size: 0.8em;
+    margin-bottom: 0.3em;
+    color: #aaa;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .step-nav-item .step-title {
+    font-size: 0.9em;
+    display: block;
+    color: #aaa;
+    transition: color 0.3s ease;
+  }
+
+  .step-nav-item.current-step {
+    background-color: transparent;
+    cursor: default;
+  }
+  .step-nav-item.current-step .step-number {
+    background-color: var(--mainColor);
+    color: white;
+  }
+  .step-nav-item.current-step .step-title {
+    color: var(--mainColor);
+    font-weight: 600;
+  }
+
+  .step-nav-item.accessible-step {
+    cursor: pointer;
+  }
+  .step-nav-item.accessible-step .step-number {
+    background-color: #e0e0e0;
+    color: var(--secColor);
+  }
+  .step-nav-item.accessible-step .step-title {
+    color: var(--secColor);
+    font-weight: 500;
+  }
+
+  .step-nav-item.accessible-step:hover .step-number {
+    background-color: var(--accentColor);
+    color: white;
+  }
+  .step-nav-item.accessible-step:hover .step-title {
+    color: var(--accentColor);
+    font-weight: 600;
+  }
+
+  .step-nav-item.accessible-step .step-link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+    display: block;
+    text-decoration: none;
+  }
+
+  .step-nav-item.inaccessible-step {
+    color: #ccc;
+    cursor: default;
+  }
+  .step-nav-item.inaccessible-step .step-number {
+    background-color: #f5f5f5;
+    color: #ccc;
+  }
+  .step-nav-item.inaccessible-step .step-title {
+    color: #ccc;
+  }
+  /* === /Schritt-Navigation === */
+
+  /* === Styles für die Zusammenfassung === */
+  .summary-content {
+    padding: 0.5rem 0; /* Leichter Abstand oben/unten */
+  }
+
+  .summary-section {
+    margin-bottom: 2rem; /* Größerer Abstand zwischen Sektionen */
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--borderColor, #eee);
+  }
+  /* Letzte Sektion hat keinen unteren Rand */
+  .summary-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .summary-section h3 {
+    font-size: 1.2rem; /* Größere Überschrift für Sektionen */
+    color: var(--mainColor);
+    margin-bottom: 1.2rem; /* Mehr Abstand unter der Überschrift */
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accentColor); /* Linie unter der Sektionsüberschrift */
+    display: inline-block; /* Sorgt dafür, dass der Border nur unter dem Text ist */
+  }
+
+  .summary-item {
+    display: grid;
+    grid-template-columns: 220px 1fr; /* Mehr Platz für das Label */
+    gap: 0.5rem 1rem; /* Vertikaler und horizontaler Abstand */
+    margin-bottom: 0.8rem; /* Mehr Abstand zwischen Items */
+    font-size: 0.9rem;
+    align-items: start; /* Wichtig für mehrzeilige Werte */
+  }
+
+  .summary-item strong {
+    font-weight: 600; /* Etwas weniger fett als 700 */
+    color: var(--cardTextColor);
+    padding-top: 2px; /* Leichte Anpassung für bessere Ausrichtung mit dem Wert */
+  }
+
+  .summary-item span {
+    word-break: break-word;
+    color: var(--mainColor);
+    line-height: 1.4; /* Bessere Lesbarkeit bei Zeilenumbrüchen */
+  }
+
+  /* Styling für fehlende Werte */
+  .summary-item span.missing-value {
+    color: #999;
+    font-style: italic;
+  }
+
+  /* Boolean-Werte (Ja/Nein) */
+  .summary-item span.boolean-true {
+    color: #28a745; /* Grün */
+    font-weight: 600;
+  }
+  .summary-item span.boolean-false {
+    color: #dc3545; /* Rot */
+    font-weight: 600;
+  }
+
+  /* Dateiuploads */
+  .file-info a {
+    color: var(--accentColor);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .file-info a:hover {
+    text-decoration: underline;
+  }
+  .file-info img.preview {
+    max-width: 180px; /* Etwas größere Vorschau */
+    max-height: 100px;
+    display: block;
+    margin-top: 8px;
+    border: 1px solid var(--borderColor, #eee);
+    border-radius: 4px;
+  }
+  .file-info .file-details {
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: 4px;
+  }
+
+  /* Unfall-Szenarien Liste */
+  .accident-scenarios-list {
+    list-style: disc; /* Oder none, wenn keine Punkte gewünscht */
+    padding-left: 20px;
+    margin: 0;
+    color: var(--mainColor);
+  }
+  .accident-scenarios-list li {
+    margin-bottom: 0.4rem;
+  }
+
+  /* Lange Texte (Unfallhergang) */
+  .long-text {
+    white-space: pre-wrap; /* Behält Zeilenumbrüche und Leerzeichen bei */
+    background-color: #f8f9fa; /* Leichter Hintergrund zur Abhebung */
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--borderColor, #eee);
+    max-height: 200px; /* Optional: Maximale Höhe mit Scrollbar */
+    overflow-y: auto; /* Optional: Scrollbar hinzufügen */
+  }
+
+  /* Button Container (identisch zum Wizard) */
+  .buttonContainer {
+    margin-top: 2.5rem; /* Mehr Abstand oben */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  /* Button Styles werden von base.css und Wizard-Styles geerbt (.btn-secondary, .formSubmit) */
+</style>
+
+<!-- Form Stylings -->
+<style>
+  main .formSection {
+    width: 100%;
+    max-width: 700px; /* Behält die maximale Breite bei */
+    box-sizing: border-box;
+  }
+
+  /* Styling für die Karte innerhalb des Formularbereichs (ergänzt base.css) */
+  main .formSection .card {
+    width: 100%;
+    box-sizing: border-box;
+    /* Zusätzliche Stile hier, falls nötig, die von base.css abweichen */
+  }
+
+  /* Styling für Formularfelder (Container für Label + Input) */
+  main .formSection form .formField {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* Abstand zwischen Label und Input */
+    margin-bottom: 1.33rem; /* Abstand zwischen Formularfeldern */
+  }
+
+  /* Label-Styling */
+  main .formSection form .formField label {
+    font-size: 0.9rem;
+    color: var(--cardTextColor); /* Variable aus base.css */
+    font-weight: 700;
+  }
+
+  /* Styling für Standard-Inputs, Selects und Textareas */
+  main .formSection form .formField input,
+  main .formSection form div.formField select,
+  main .formSection form div.formField textarea {
+    color: var(--mainColor); /* Variable aus base.css */
+    display: initial;
+    font-size: 0.85rem;
+    width: 95%; /* Leichter Einzug */
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #ced4da; /* Standard-Randfarbe, kann durch var(--borderColor) ersetzt werden, falls definiert */
+    border-radius: 4px; /* Einheitlicher Radius */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Sanfter Übergang */
+    background-color: #fff; /* Heller Hintergrund */
+  }
+
+  /* Spezifische Breite für Select-Elemente */
+  main .formSection form div.formField select {
+    width: 99%; /* Fast volle Breite */
+  }
+
+  /* Fokus-Styling für Inputs, Selects und Textareas */
+  main .formSection form .formField input:focus,
+  main .formSection form .formField select:focus,
+  main .formSection form .formField textarea:focus {
+    box-shadow: 0 0 0 2px rgba(var(--accentColorRGB, 90, 165, 185), 0.2); /* Leichter Fokus-Schatten in Akzentfarbe (RGB benötigt) */
+    border-color: var(--accentColor); /* Akzentfarbe für den Rand im Fokus */
+    outline: 0;
+    font-weight: 500; /* Leicht fettere Schrift im Fokus */
+  }
+
+  /* Styling für Checkbox-Felder (Label neben Checkbox) */
+  main .formSection form .formField.checkboxField {
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  main .formSection form .formField.checkboxField input {
+    width: 17px;
+    height: 17px;
+    margin-bottom: 0; /* Kein unterer Rand für die Checkbox selbst */
+    padding: 0;
+    border-radius: 3px;
+  }
+  main .formSection form .formField.checkboxField input:focus {
+    box-shadow: 0 0 0 2px rgba(var(--accentColorRGB, 90, 165, 185), 0.2);
+    border-color: var(--accentColor);
+  }
+
+  main .formSection form .formField input[type="checkbox"]:focus {
+    box-shadow: none;
+    transition: none;
+  }
+
+  /* Submit-Button Styling (angelehnt an .mainButton aus base.css) */
+  main .formSection form .formSubmit {
+    cursor: pointer;
+    font-weight: 500;
+    color: #fff;
+    background-image: linear-gradient(to right, var(--mainColor) 0%, var(--secColor) 51%, var(--mainColor) 100%);
+    background-size: 200% auto;
+    padding: 0.7rem 1.5rem; /* Etwas mehr Padding für bessere Klickbarkeit */
+    box-shadow: none;
+    border-radius: 4px;
+    border: 0px;
+    transition: background-position 0.33s ease-in; /* Nur Hintergrund animieren */
+    font-size: 0.95rem; /* Etwas größer */
+    text-decoration: none;
+    display: inline-block; /* Wichtig für Padding etc. */
+    text-align: center;
+  }
+
+  main .formSection form .formSubmit:hover {
+    background-position: right center; /* Effekt aus base.css */
+  }
+
+  /* Styling für den Zurück-Button (optional, falls vorhanden) */
+  main .formSection form .btn-secondary {
+    background-color: #6c757d; /* Standard Bootstrap Grau oder eigene Variable */
+    color: white;
+    padding: 0.7rem 1.5rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+  }
+  main .formSection form .btn-secondary:hover {
+    background-color: #5a6268;
+  }
+
+  /* Container für die Buttons am Ende */
+  main .formSection form .buttonContainer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between; /* Buttons an den Enden platzieren */
+    align-items: center;
+  }
+
+  /* Styling für ALLE angehakten Checkboxen */
+  main .formSection form .formField input[type="checkbox"]:checked {
+    background-color: var(--accentColor);
+    border-color: var(--accentColor);
+    /* Optional: Haken hinzufügen, wenn gewünscht (siehe unten) */
+  }
+
+  /* Optional: Haken für ALLE angehakten Checkboxen */
+  main .formSection form .formField input[type="checkbox"]:checked::after {
+    content: "✔";
+    position: absolute; /* Benötigt 'position: relative;' auf der Checkbox selbst, was bereits der Fall sein sollte durch appearance: none */
+    color: white;
+    font-size: 12px; /* Größe des Hakens anpassen */
+    line-height: 15px; /* Vertikal zentrieren (an Checkbox-Höhe anpassen) */
+    top: 50%; /* Vertikal mittig */
+    left: 50%; /* Horizontal mittig */
+    transform: translate(-50%, -50%); /* Exakte Zentrierung */
+    pointer-events: none; /* Sorgt dafür, dass der Haken nicht klickbar ist */
+  }
+
+  /* Basis-Styling für Checkboxen (um sicherzustellen, dass ::after funktioniert) */
+  main .formSection form .formField input[type="checkbox"] {
+    appearance: none; /* Wichtig für benutzerdefiniertes Styling */
+    -webkit-appearance: none;
+    position: relative; /* Wichtig für ::after Positionierung */
+    /* Behalte andere Basis-Styles wie width, height, border, border-radius bei */
+    width: 17px;
+    height: 17px;
+    border: 1px solid #ced4da;
+    border-radius: 3px;
+    vertical-align: middle; /* Bessere Ausrichtung im Textfluss */
+    cursor: pointer;
+  }
+
+  /* Hinzufügen einer RGB-Version der Akzentfarbe für den Box-Shadow */
+  :root {
+    /* Beispiel: Wenn --accentColor: #5aa5b9 ist */
+    --accentColorRGB: 90, 165, 185;
+  }
+</style>
+
+<!-- multiple-checkbox-group -->
+<style>
+  div.multiple-checkbox-group {
+    display: flex;
+    flex-wrap: wrap; /* Umbruch bei Bedarf */
+    gap: 1rem 1rem; /* Vertikaler und horizontaler Abstand */
+    padding: 1rem 0; /* Abstand oben/unten */
+  }
+
+  /* Container für jedes einzelne Checkbox-Label-Paar */
+  div.multiple-checkbox-group > div {
+    /* Jedes Element nimmt ca. die Hälfte der Breite ein, abzüglich des Gaps */
+    width: calc(50% - 0.5rem);
+    box-sizing: border-box;
+    align-self: start; /* Oben ausrichten */
+  }
+
+  /* Das Label innerhalb der Mehrfachauswahl */
+  div.formField.multipleChoiceField div > label {
+    display: flex;
+    gap: 10px; /* Abstand zwischen Checkbox und Text */
+    align-items: start; /* Oben ausrichten für längeren Text */
+    font-weight: 400; /* Normale Schriftstärke */
+    font-size: 0.85rem; /* Etwas kleinere Schrift */
+    color: var(--mainColor); /* Textfarbe */
+    cursor: pointer;
+  }
+
+  /* Die Checkbox selbst innerhalb der Mehrfachauswahl */
+  div.formField.multipleChoiceField div > label input[type="checkbox"] {
+    height: 17px;
+    width: 17px; /* Feste Größe */
+    flex-shrink: 0; /* Verhindert Schrumpfen */
+    margin-top: 2px; /* Leichte Anpassung der vertikalen Position */
+    padding: 0; /* Kein Innenabstand */
+    border-radius: 3px;
+    border: 1px solid #ced4da;
+    cursor: pointer;
+    position: relative; /* Für Pseudo-Elemente */
+  }
+</style>
+
+<!-- Datepicker styles -->
+<style>
+  .flatpickr-calendar {
+    width: auto;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--borderColor, #e5e7eb); /* Rand passend zum Projekt */
+    padding: 10px;
+    font-family: inherit; /* Schriftart von deiner Seite erben */
+    font-size: 0.9rem;
+  }
+
+  /* Monatsnavigation (Pfeile & Monatsname/Jahr) */
+  .flatpickr-months {
+    padding: 10px 0;
+    align-items: center;
+  }
+
+  .flatpickr-prev-month,
+  .flatpickr-next-month {
+    fill: var(--mainColor); /* Hauptfarbe für Pfeile */
+    top: 15px;
+    position: relative; /* Zurücksetzen für korrekte Positionierung */
+    height: unset;
+    line-height: 100%;
+  }
+  .flatpickr-prev-month:hover svg,
+  .flatpickr-next-month:hover svg {
+    fill: var(--secColor); /* Sekundärfarbe beim Hover */
+  }
+  /* Span um Monatsname/Jahr */
+  .flatpickr-current-month {
+    font-size: 1rem;
+    color: var(--mainColor);
+    padding-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Kleinerer Abstand zwischen Monat/Jahr */
+    font-weight: 600; /* Etwas fetter */
+  }
+  .flatpickr-monthDropdown-months,
+  .flatpickr-current-month input.cur-year {
+    font-size: 0.9rem; /* Angepasste Größe */
+    font-weight: 500;
+    padding: 2px 6px;
+    height: auto;
+    line-height: normal;
+    background-color: #fff;
+    border: 1px solid var(--borderColor, #ccc);
+    border-radius: 4px;
+    box-shadow: none;
+  }
+  .flatpickr-monthDropdown-months option {
+    font-size: 0.9rem;
+    font-weight: normal;
+  }
+
+  /* Wochentage (Mo, Di, ...) */
+  .flatpickr-weekdaycontainer {
+    padding: 5px 0;
+  }
+  span.flatpickr-weekday {
+    color: var(--secColor); /* Sekundärfarbe für Wochentage */
+    font-size: 0.75rem;
+    font-weight: 600; /* Fetter als normal */
+    text-transform: uppercase;
+  }
+
+  /* Container für die Tage */
+  .dayContainer {
+    padding: 5px 0;
+    width: auto;
+    min-width: 280px;
+  }
+
+  /* Einzelne Tage */
+  .flatpickr-day {
+    border: none;
+    border-radius: 4px;
+    margin: 2px;
+    line-height: 32px; /* Höhe der Tage */
+    height: 32px;
+    font-weight: 400;
+    color: var(--mainColor); /* Hauptfarbe für Text */
+    max-width: 32px;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .flatpickr-day:hover {
+    background: var(--mainColor); /* Hauptfarbe als Hintergrund beim Hover */
+    color: #fff;
+    cursor: pointer;
+  }
+
+  /* Heutiger Tag */
+  .flatpickr-day.today {
+    border: 1px solid var(--accentColor);
+    color: var(--accentColor);
+    background: transparent;
+  }
+  .flatpickr-day.today:hover {
+    background: var(--accentColor);
+    color: #fff;
+    border-color: var(--accentColor);
+  }
+
+  /* Ausgewählter Tag / Bereich */
+  .flatpickr-day.selected,
+  .flatpickr-day.startRange,
+  .flatpickr-day.endRange,
+  .flatpickr-day.selected.inRange,
+  .flatpickr-day.startRange:hover,
+  .flatpickr-day.endRange:hover,
+  .flatpickr-day.selected:focus,
+  .flatpickr-day.selected:hover {
+    background: var(--accentColor);
+    border-color: var(--accentColor);
+    color: white;
+    box-shadow: none;
+  }
+  span.flatpickr-day.selected:hover {
+    opacity: 0.9; /* Leichte Transparenz beim Hover auf ausgewähltem Tag */
+  }
+
+  /* Tage außerhalb des aktuellen Monats */
+  .flatpickr-day.prevMonthDay,
+  .flatpickr-day.nextMonthDay {
+    color: #ccc; /* Helles Grau */
+    background: transparent;
+  }
+  .flatpickr-day.prevMonthDay:hover,
+  .flatpickr-day.nextMonthDay:hover {
+    background: #f0f0f0; /* Sehr heller Hintergrund beim Hover */
+    color: #999;
+  }
+
+  /* Zeit-Auswahl (falls aktiviert) */
+  .flatpickr-time {
+    border-top: 1px solid var(--borderColor, #eee);
+    padding-top: 8px;
+  }
+  .flatpickr-time input {
+    font-size: 0.9rem;
+    background: var(--backgroundColor, #f8fafd); /* Hintergrund passend zum Projekt */
+    border: 1px solid var(--borderColor, #eee);
+    border-radius: 4px;
+    padding: 4px 6px;
+  }
+  .flatpickr-time .numInputWrapper:hover {
+    background: #e9ecef; /* Leicht dunklerer Hintergrund beim Hover */
+  }
+  .flatpickr-time .flatpickr-am-pm {
+    color: var(--mainColor);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .flatpickr-time .flatpickr-am-pm:hover {
+    background: #eee;
+  }
+
+  .flatpickr-months .flatpickr-prev-month,
+  .flatpickr-months .flatpickr-next-month {
+    height: fit-content;
+    position: relative;
+  }
+</style>
+
+<!-- image summary styles -->
+<style>
+  .image-summary-list {
+    padding-left: 0;
+    list-style: none;
+  }
+  .image-summary-list li {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .image-summary-list strong {
+    display: inline-block;
+    min-width: 150px; /* Für Ausrichtung */
+  }
+  .image-summary-list .file-details {
+    font-size: 0.8rem;
+    color: #777;
+    margin-left: 5px;
+  }
+</style>
+
+{% endblock page_styles %}
+
+<!-- scripts -->
+
+{% block content %}
+
+<div class="pageTitleSection">
+  <p class="pageTitle">Zusammenfassung & Bestätigung</p>
+</div>
+<div class="formSection">
+  <div class="card">
+    <div class="titleSection">
+      <p class="cardTitle">
+        <span class="titleLine"></span> Bitte überprüfen Sie Ihre Eingaben (Schritt {{ wizard.steps.step1 }} von {{
+        wizard.steps.count }})
+      </p>
+    </div>
+    <form method="post" enctype="multipart/form-data" id="wizard-form">
+      {% csrf_token %} {{ wizard.management_form }}
+
+      <!-- step Navigation Section -->
+      {% include 'reports/wizard_navigation.html' %}
+      <!-- / step Navigation Section -->
+
+      <div class="summary-content">
+        {% if all_form_data %}
+        <div class="summary-section">
+          <h3>Allgemein & Persönlich</h3>
+          <div class="summary-item">
+            <strong>Privatperson/Firma:</strong>
+            <span>{{ all_form_data.get.person_or_company|default:"-"|title }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Vorname:</strong>
+            <span>{{ all_form_data.first_name|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Nachname:</strong>
+            <span>{{ all_form_data.last_name|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Unfalldatum:</strong>
+            <span>{{ all_form_data.accident_date|date:"d. F Y"|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Adresse:</strong>
+            <span>{{ all_form_data.address|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>E-Mail:</strong>
+            <span>{{ all_form_data.email|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Telefon:</strong>
+            <span>{{ all_form_data.phone_number|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Unterschrift:</strong>
+            <span class="file-info">
+              {% with signature=all_form_data.signature %} {% if signature %} {{ signature.name }}
+              <span class="file-details">({{ signature.size|filesizeformat }})</span>
+              <br />
+              <img src="{{ signature.url }}" alt="Vorschau Unterschrift" class="preview" />
+              {% else %}
+              <span class="missing-value">- Keine Unterschrift hochgeladen -</span>
+              {% endif %} {% endwith %}
+            </span>
+          </div>
+        </div>
+        <div class="summary-section">
+          <h3>Bank & Versicherung</h3>
+          <div class="summary-item">
+            <strong>Bank:</strong>
+            <span>{{ all_form_data.bank_name|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>IBAN:</strong>
+            <span>{{ all_form_data.iban|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>BIC:</strong>
+            <span>{{ all_form_data.bic|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Kontoinhaber:</strong>
+            <span>{{ all_form_data.bank_holder|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Rechtschutz vorhanden:</strong>
+            {% with value=all_form_data.legal_protection %}
+            <span class="{% if value %}boolean-true{% else %}boolean-false{% endif %}">
+              {% if value %}Ja{% else %}Nein{% endif %}
+            </span>
+            {% endwith %}
+          </div>
+        </div>
+        <div class="summary-section">
+          <h3>Fahrzeug</h3>
+          <div class="summary-item">
+            <strong>Kennzeichen:</strong>
+            <span>{{ all_form_data.plate_number|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>HU bis:</strong>
+            <span>{{ all_form_data.inspection|date:"F Y"|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Scheckheft vorhanden:</strong>
+            {% with value=all_form_data.checkbook_exists %}
+            <span class="{% if value %}boolean-true{% else %}boolean-false{% endif %}">
+              {% if value %}Ja{% else %}Nein{% endif %}
+            </span>
+            {% endwith %}
+          </div>
+          <div class="summary-item">
+            <strong>Scheckheft Upload:</strong>
+            <span class="file-info">
+              {% with checkbook=all_form_data.checkbook %} {% if checkbook %}
+              <a href="{{ checkbook.url }}" target="_blank">{{ checkbook.name }}</a>
+              <span class="file-details">({{ checkbook.size|filesizeformat }})</span>
+              {% else %}
+              <span class="missing-value">- Kein Scheckheft hochgeladen -</span>
+              {% endif %} {% endwith %}
+            </span>
+          </div>
+          <div class="summary-item">
+            <strong>Geleast:</strong>
+            {% with value=all_form_data.leased %}
+            <span class="{% if value %}boolean-true{% else %}boolean-false{% endif %}">
+              {% if value %}Ja{% else %}Nein{% endif %}
+            </span>
+            {% endwith %}
+          </div>
+          <div class="summary-item">
+            <strong>Finanziert:</strong>
+            {% with value=all_form_data.financed %}
+            <span class="{% if value %}boolean-true{% else %}boolean-false{% endif %}">
+              {% if value %}Ja{% else %}Nein{% endif %}
+            </span>
+            {% endwith %}
+          </div>
+        </div>
+        <div class="summary-section">
+          <h3>Unfallgegner & Hergang</h3>
+          <div class="summary-item">
+            <strong>Kennzeichen (Gegner):</strong>
+            <span>{{ all_form_data.opponent_plate_number|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Vers.-Nr. (Gegner):</strong>
+            <span>{{ all_form_data.opponent_insurance_number|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Schadensnummer:</strong>
+            <span>{{ all_form_data.damage_number|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Zeugen vorhanden:</strong>
+            {% with value=all_form_data.has_witnesses %}
+            <span class="{% if value %}boolean-true{% else %}boolean-false{% endif %}">
+              {% if value %}Ja{% else %}Nein{% endif %}
+            </span>
+            {% endwith %}
+          </div>
+          <div class="summary-item">
+            <strong>Unfallzeitpunkt:</strong>
+            <span>
+              {% if all_form_data.accident_datetime %} {{ all_form_data.accident_datetime|date:"d. F Y, H:i" }} Uhr {% else
+              %} - {% endif %}
+            </span>
+          </div>
+          <div class="summary-item">
+            <strong>Unfallort:</strong>
+            <span>{{ all_form_data.accident_location|default:"-" }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>Unfallszenarien:</strong>
+            <span>
+              {% with scenarios=all_form_data.accident_scenarios %} {% if scenarios %}
+              <ul class="accident-scenarios-list">
+                {% for scenario in scenarios %}
+                <li>{{ scenario }}</li>
+                {% endfor %}
+              </ul>
+              {% else %}
+              <span class="missing-value">- Keine Szenarien ausgewählt -</span>
+              {% endif %} {% endwith %}
+            </span>
+          </div>
+          <div class="summary-item" style="grid-template-columns: 220px 1fr">
+            <strong>Unfallhergang (Notizen):</strong>
+            <span class="long-text">{{ all_form_data.accident_notes|default:"-" }}</span>
+          </div>
+        </div>
+        <div class="summary-section">
+          <h3>Hochgeladene Bilder</h3>
+          {% if uploaded_image_info %}
+          <ul class="image-summary-list">
+            {% for view_key, info in uploaded_image_info.items %}
+            <li>
+              <strong>{{ info.label|default:view_key }}:</strong>
+              {{ info.name }}
+              <span class="file-details">({{ info.size|filesizeformat }})</span>
+            </li>
+            {% empty %}
+            <li><span class="missing-value">- Keine Bilder für den Upload ausgewählt -</span></li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p><span class="missing-value">- Keine Bilder für den Upload ausgewählt -</span></p>
+          {% endif %}
+        </div>
+
+        {% else %}
+        <p style="color: red; font-weight: bold; text-align: center; padding: 2rem">
+          Fehler: Es konnten keine Formulardaten zum Anzeigen geladen werden. Bitte gehen Sie zurück und versuchen Sie es
+          erneut.
+        </p>
+        {% endif %}
+      </div>
+      {% if all_form_data %}
+      <div class="buttonContainer">
+        <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" class="btn-secondary">Zurück</button>
+
+        <button type="submit" class="formSubmit">Bestätigen und absenden</button>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock content %}

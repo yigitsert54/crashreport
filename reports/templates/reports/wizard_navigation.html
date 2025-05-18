@@ -1,0 +1,149 @@
+<!-- form navigation styles -->
+<style>
+  .step-navigation {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--secondaryColor3, #eee);
+    padding-bottom: 1rem;
+  }
+
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+  }
+
+  .step-nav-item {
+    text-align: center;
+    flex-grow: 1;
+    padding: 10px 5px;
+    border-radius: 4px;
+    position: relative;
+    transition: background-color 0.3s ease;
+  }
+
+  /* Nummerierung der Schritte */
+  .step-nav-item .step-number {
+    display: block;
+    font-weight: bold;
+    font-size: 0.8em;
+    margin-bottom: 0.3em;
+    color: var(--secondaryColor2);
+    background-color: var(--secondaryColor3);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Titel der Schritte */
+  .step-nav-item .step-title {
+    font-size: 0.9em;
+    display: block;
+    color: var(--secondaryColor2); /* Standardmäßig ausgegraut */
+    transition: color 0.3s ease;
+  }
+
+  /* Aktueller Schritt */
+  .step-nav-item.current-step {
+    background-color: transparent; /* Kein Hintergrund für den aktuellen, nicht-klickbaren Schritt */
+    cursor: default;
+  }
+  .step-nav-item.current-step .step-number {
+    background-color: var(--primaryColor2);
+    color: white;
+  }
+  .step-nav-item.current-step .step-title {
+    color: var(--primaryColor2);
+    font-weight: 500;
+  }
+
+  /* Erreichbarer Schritt (klickbar) */
+  .step-nav-item.accessible-step {
+    cursor: pointer;
+  }
+  .step-nav-item.accessible-step .step-number {
+    background-color: var(--secondaryColor3);
+    color: var(--secondaryColor1);
+  }
+  .step-nav-item.accessible-step .step-title {
+    color: var(--primaryColor3);
+    font-weight: 500;
+  }
+
+  /* Hover-Effekt für erreichbare Schritte */
+  .step-nav-item.accessible-step:hover .step-number {
+    background-color: var(--secondaryColor2);
+    color: white;
+  }
+  .step-nav-item.accessible-step:hover .step-title {
+    color: var(--primaryColor1);
+    font-weight: 500;
+  }
+
+  /* Button innerhalb des erreichbaren Schritts */
+  .step-nav-item.accessible-step .step-link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit; /* Erbt Farbe vom Elternelement (.step-title) */
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+    display: block;
+    text-decoration: none; /* Keine Unterstreichung */
+  }
+
+  /* Nicht erreichbarer Schritt */
+  .step-nav-item.inaccessible-step {
+    color: var(--secondaryColor3);
+    cursor: default;
+  }
+  .step-nav-item.inaccessible-step .step-number {
+    background-color: #f5f5f5;
+    color: #ccc;
+  }
+
+  .step-nav-item.inaccessible-step .step-title {
+    color: #ccc;
+  }
+</style>
+<!-- / form navigation styles -->
+
+<nav class="step-navigation" aria-label="Formularschritte">
+  <ol class="step-list">
+    <!-- Loop through steps -->
+    {% for step in steps_info %}
+
+    <!-- Check if step is current -->
+    {% if step.is_current %}
+    <li class="step-nav-item current-step" aria-current="step">
+      <span class="step-number">{{ step.number }}</span>
+      <span class="step-title">{{ step.title }}</span>
+    </li>
+
+    <!-- Check if step is accessible -->
+    {% elif step.is_accessible %}
+    <li class="step-nav-item accessible-step">
+      <button type="submit" name="wizard_goto_step" value="{{ step.name }}" class="step-link-button">
+        <span class="step-number">{{ step.number }}</span>
+        <span class="step-title">{{ step.title }}</span>
+      </button>
+    </li>
+
+    <!-- Step not accessible -->
+    {% else %}
+    <li class="step-nav-item inaccessible-step">
+      <span class="step-number">{{ step.number }}</span>
+      <span class="step-title">{{ step.title }}</span>
+    </li>
+    {% endif %} {% endfor %}
+  </ol>
+</nav>

@@ -1,0 +1,27 @@
+{% load static %}
+
+<aside id="layout-menu" class="layout-menu-horizontal menu-horizontal menu bg-menu-theme flex-grow-0">
+  <div class="container-xxl d-flex h-100">
+    <ul class="menu-inner">
+
+      <!-- reports -->
+      {% url 'reports_home' as reports_home %}
+      <li class="menu-item {% if request.path == reports_home %}active{% endif %}">
+        <a href="{% url 'reports_home' %}" class="menu-link">
+          <i class="menu-icon tf-icons bx bx-buildings"></i>
+          <div data-i18n="Aufträge">Aufträge</div>
+        </a>
+      </li>
+
+
+      <!-- VIEW_NAME -->
+      <!-- {% url 'URL_NAME' as URL_VARIABLE_NAME %}
+      <li class="menu-item {% if request.path == URL_VARIABLE_NAME %}active{% endif %}">
+        <a href="{{TARGET_URL}}" class="menu-link">
+          <i class="menu-icon tf-icons bx bx-cloud"></i>
+          <div data-i18n="DISPLAY_NAME">DISPLAY_NAME</div>
+        </a>
+      </li> -->
+    </ul>
+  </div>
+</aside>

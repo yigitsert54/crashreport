@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+<!-- Load static -->
+{% load static %}
+
+<!-- Page styles -->
+{% block page_styles %}
+<style>
+  header {
+    display: none;
+  }
+
+  footer {
+    display: none;
+  }
+
+  body {
+    background-color: var(--mainColor);
+  }
+
+  main {
+    max-width: var(--maxWidth);
+    margin: 0 auto;
+    min-height: calc(100vh - 2 * var(--loginTopPadding));
+    background-color: var(--mainColor);
+  }
+
+  .content .logoSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem 0 3rem;
+    color: #fff;
+  }
+
+  .content .logoSection img {
+    max-width: 300px;
+  }
+
+  .content .formSection {
+    display: flex;
+    justify-self: center;
+  }
+
+  .content .formSection .formCard {
+    flex: 0 0 360px;
+    padding: 1.5rem 1.25rem;
+    background-color: #fff;
+    margin: 0 auto 1.9rem;
+    border: 1px solid #eee;
+    border-top: none;
+    border-radius: 4px;
+    box-shadow: none;
+  }
+
+  .content .formSection .formCard .formTitle {
+    font-weight: 500;
+    color: var(--cardTextColor);
+    margin-bottom: 1.25rem;
+  }
+
+  .content .formSection form input.formInput {
+    width: 100%;
+
+    background-image: linear-gradient(var(--accentColor), var(--accentColor)), linear-gradient(#31354420, #31354420);
+    background-position: bottom, 50% calc(100% - 1px);
+    background-repeat: no-repeat;
+    background-size: 0 2px, 100% 1px;
+    transition: all 333ms ease-out;
+
+    border: 0;
+
+    color: #495057;
+    min-height: 35px;
+    font-size: 0.9rem;
+
+    padding: 0;
+    margin-bottom: 1.75rem;
+  }
+
+  .content .formSection form input.formInput:focus {
+    background-size: 100% 2px, 100% 1px;
+    outline: 0 none;
+    font-size: 1.05rem;
+    letter-spacing: 0.2px;
+  }
+
+  .content .formSection form input.formSubmit {
+    width: 100%;
+    cursor: pointer;
+    padding: 0.85rem 1.5rem;
+    margin-bottom: 2.4rem;
+
+    background-image: linear-gradient(to right, var(--btnColor) 0%, var(--accentColor) 51%, var(--btnColor) 100%);
+
+    background-size: 200% auto;
+
+    border: 1px solid;
+    border-radius: 60px;
+
+    color: #fff;
+    font-weight: 500;
+    font-size: 1.1rem;
+
+    transition: 0.2s ease-in;
+  }
+
+  .content .formSection form input.formSubmit:hover {
+    background-position: right center;
+  }
+
+  .content .formSection form input.formSubmit:focus {
+    background-position: left center;
+  }
+
+  .content .formSection form input.formSubmit:active {
+    background-position: left center;
+  }
+
+  .content .formSection .notHaveAccount {
+    text-align: center;
+    font-size: 0.9rem;
+  }
+
+  .content .formSection .notHaveAccount p {
+    color: #67757c;
+    margin-bottom: 0.4rem;
+  }
+
+  .content .formSection .notHaveAccount a.register {
+    text-decoration: none;
+    font-weight: 700;
+    color: var(--accentColor);
+    padding: 4px;
+  }
+
+  .content .formSection .notHaveAccount a.register:hover,
+  .content .formSection .notHaveAccount a.register:active {
+    color: var(--btnColor);
+  }
+
+  .content .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3rem 0 1rem;
+    color: #fff;
+  }
+
+  .content .footer p,
+  .content .footer a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+
+  .content .footer .madeIn,
+  .content .footer .legalData {
+    flex: 0 0 50%;
+    max-width: 50%;
+    text-align: center;
+  }
+
+  .content .footer .legalData p a {
+    font-weight: 500;
+    margin: 0 0.5rem;
+  }
+
+  .content .footer .madeIn p {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .content .footer p img {
+    margin-right: 0.6rem;
+    border-radius: 4px;
+  }
+</style>
+{% endblock page_styles %}
+
+<!-- Content -->
+{% block content %}
+
+<!-- main -->
+<div class="content">
+  <!-- Logo Section -->
+  <div class="logoSection">
+    <img src="{% static 'images/logo_white.svg' %}" alt="" />
+  </div>
+  <!-- / Logo Section -->
+
+  <!-- Form Section -->
+  <div class="formSection">
+    {% if purpose == "register" %}
+
+    <!-- Register -->
+    <div class="formCard">
+      <!-- form -->
+      <form action="#" method="post">
+        {% csrf_token %}
+
+        <p class="formTitle">Registrieren</p>
+
+        {% for field in form %} {{field}} {% endfor %}
+
+        <input class="formSubmit" type="submit" value="Registrieren" />
+      </form>
+      <!-- / form -->
+    </div>
+    <!-- / Register -->
+
+    {% elif purpose == "login" %}
+
+    <!-- Login -->
+    <div class="formCard">
+      <!-- form -->
+      <form action="#" method="post">
+        {% csrf_token %}
+
+        <p class="formTitle">Login</p>
+
+        {% for field in form %} {{field}} {% endfor %}
+
+        <input class="formSubmit" type="submit" value="Einloggen" />
+      </form>
+      <!-- / form -->
+
+      <!-- not have account -->
+      <div class="notHaveAccount">
+        <p>Du hast noch keinen Account?</p>
+        <a href="{% url 'register' %}" class="register">Account erstellen</a>
+      </div>
+      <!-- / not have account -->
+    </div>
+    <!-- / Login -->
+
+    {% endif %}
+  </div>
+  <!-- / Form Section -->
+
+  <!-- footer -->
+  <div class="footer">
+    <!-- madeIn -->
+    <div class="madeIn">
+      <p>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Flag_of_Germany.svg" width="34" height="19" />
+        <span>Made in Germany</span>
+      </p>
+    </div>
+    <!-- / madeIn -->
+
+    <div class="legalData">
+      <p>
+        <a href="">Impressum</a>
+        <a href="">Datenschutz</a>
+      </p>
+    </div>
+  </div>
+  <!-- / footer -->
+</div>
+<!-- / main -->
+
+{% endblock content %}

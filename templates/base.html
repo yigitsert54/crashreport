@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html
+  lang="en"
+  class="light-style layout-compact"
+  dir="ltr"
+  data-theme="theme-default"
+  data-assets-path="{% static '' %}"
+  data-template="horizontal-menu-template-no-customizer"
+  data-style="light"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+
+    <title>{% block tab_title %}{% endblock tab_title %}</title>
+
+    <meta name="description" content="" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon/favicon.ico' %}" />
+
+    <!-- Include all CDNs, fonts & icons -->
+    {% include 'xcdns.html' %}
+
+    <!-- Include core CSS -->
+    {% include 'xcss.html' %}
+
+    <!-- Page styles -->
+    {% block page_styles %} {% endblock page_styles %}
+
+    <!-- Helpers -->
+    <script src="{% static 'vendor/js/helpers.js' %}"></script>
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="{% static 'js/config.js' %}"></script>
+  </head>
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-navbar-full layout-horizontal layout-without-menu">
+      <div class="layout-container">
+        <!-- Top Navigation -->
+        {% include 'top_navigation.html' %}
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <!-- main Navbar -->
+            {% include 'navbar.html' %}
+
+            <!-- Content -->
+            <div class="container-xxl flex-grow-1 container-p-y">
+              <!-- Page Title & Description -->
+              <div class="row pageTitle">
+                <!-- Page Title -->
+                <h4 class="pageTitle mb-2">{% block page_title %}{% endblock page_title %}</h4>
+                <!-- Page Description -->
+                <!-- {% block page_description %}{% endblock page_description %} -->
+              </div>
+
+              <!-- Block Content -->
+              {% block content %} {% endblock content %}
+
+              <!-- Messages -->
+              {% if messages %} {% for message in messages %}
+              <div
+                class="bs-toast toast-ex toast animate__animated my-2 fade {{message.tags}} animate__swing show"
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true"
+              >
+                <div class="toast-header">
+                  <i class="bx bx-bell d-block w-px-20 h-auto rounded me-2"></i>
+                  <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">{{message}}</div>
+              </div>
+              {% endfor %} {% endif %}
+              <!-- End messages -->
+            </div>
+            <!--/ Content -->
+
+            <!-- Footer -->
+            {% include 'footer.html' %}
+
+            <div class="content-backdrop fade"></div>
+          </div>
+          <!--/ Content wrapper -->
+        </div>
+
+        <!--/ Layout container -->
+      </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+
+    <!-- End Layout wrapper -->
+
+    <!-- Include Core Scripts -->
+    {% include 'xscripts.html' %}
+
+    <!-- Page Skripts -->
+    {% block page_scripts %} {% endblock page_scripts %}
+  </body>
+</html>
