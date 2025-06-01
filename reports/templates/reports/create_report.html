@@ -10,6 +10,50 @@
   .flatpickr-wrapper {
     display: block !important;
   }
+
+  .reportWizard .bs-stepper-content {
+    max-width: 800px;
+  }
+
+  div#id_accident_scenarios {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 0.7rem 1.2rem;
+    padding-top: 0.5rem;
+  }
+
+  #id_accident_scenarios > div > label {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .wizardFormField {
+    margin-bottom: 1.2rem;
+  }
+
+  .wizardFormField.hide {
+    display: none;
+  }
+</style>
+
+<!-- signature pad stylings -->
+<style>
+  #signature-pad {
+    border: 1px solid #ced4da; /* Wie andere Inputs */
+    border-radius: 4px; /* Wie andere Inputs */
+    background-color: #fff;
+    cursor: crosshair;
+    touch-action: none; /* Wichtig für Touch-Geräte */
+    width: 100%; /* Nimm die volle Breite ein */
+    height: 200px; /* Passe die Höhe an */
+    display: block; /* Verhindert extra Platz unter dem Canvas */
+  }
+
+  .signature-button-group {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
 </style>
 {% endblock page_styles %}
 
@@ -58,7 +102,7 @@
       enableTime: true,
       dateFormat: "d.m.Y H:i",
       static: false,
-      locale: "de",
+      locale: "de", // Dies ist korrekt
       time_24hr: true,
     });
   });
@@ -75,6 +119,191 @@
   });
 </script>
 
+<!-- Autosize textfield -->
+<script>
+  const textarea = document.querySelectorAll("textarea");
+  textarea.forEach((element) => {
+    autosize(element);
+  });
+</script>
+
+<!-- Show/hide fields scripts -->
+<script>
+  function toggleFieldVisibility(field, state) {
+    // Extract parent formField
+    let parentFormField = field.closest("div.wizardFormField");
+
+    if (state == "show") {
+      parentFormField.classList.remove("hide");
+    } else {
+      parentFormField.classList.add("hide");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Extract person_or_company select field
+    const person_or_company = document.querySelector("#id_person_or_company");
+
+    // Extract checkbook_exists field
+    const checkbook_exists = document.querySelector("#id_checkbook_exists");
+
+    // if person_or_company
+    if (person_or_company) {
+      // Extract company name field
+      let company_name_field = document.querySelector("#id_company_name");
+
+      // If company is selected, show company name field
+      if (person_or_company.value == "company") {
+        toggleFieldVisibility(company_name_field, "show");
+      } else {
+        toggleFieldVisibility(company_name_field, "hide");
+      }
+
+      person_or_company.addEventListener("change", function () {
+        // If company is selected, show company name field
+        if (person_or_company.value == "company") {
+          toggleFieldVisibility(company_name_field, "show");
+        } else {
+          toggleFieldVisibility(company_name_field, "hide");
+        }
+      });
+    }
+    // endif person_or_company
+
+    // if checkbook_exists
+    if (checkbook_exists) {
+      // Extract checkbook upload field
+      let checkbook_upload_field = document.querySelector("#id_checkbook");
+
+      // If checkbook_exists field is checked show upload field
+      if (checkbook_exists.checked) {
+        toggleFieldVisibility(checkbook_upload_field, "show");
+      } else {
+        toggleFieldVisibility(checkbook_upload_field, "hide");
+      }
+
+      checkbook_exists.addEventListener("change", function () {
+        // If company is selected, show company name field
+        if (checkbook_exists.checked) {
+          toggleFieldVisibility(checkbook_upload_field, "show");
+        } else {
+          toggleFieldVisibility(checkbook_upload_field, "hide");
+        }
+      });
+    }
+    // endif checkbook_exists
+  });
+</script>
+
+<!-- Signature Pad -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Überprüfen, ob SignaturePad geladen wurde
+    if (typeof SignaturePad === "undefined") {
+      console.error("SignaturePad konnte nicht geladen werden!");
+      return;
+    }
+
+    const canvas = document.getElementById("signature-pad");
+    const clearButton = document.getElementById("clear-signature-button");
+    // Das versteckte Eingabefeld, das von Django für 'signature_base64' generiert wird
+    const signatureDataInput = document.getElementById("id_signature_base64");
+
+    if (!canvas) {
+      console.error('Canvas-Element mit ID "signature-pad" nicht gefunden.');
+      return;
+    }
+    // Wenn der Clear-Button nicht da ist, ist das nicht kritisch für das reine Zeichnen.
+    if (!clearButton) {
+      console.warn('Button-Element mit ID "clear-signature-button" nicht gefunden.');
+    }
+    // Das versteckte Feld ist für das reine Zeichnen auch nicht primär, wird aber beim Löschen geleert.
+    if (!signatureDataInput) {
+      console.warn('Verstecktes Eingabefeld "id_signature_base64" nicht gefunden.');
+    }
+
+    const signaturePad = new SignaturePad(canvas, {
+      backgroundColor: "rgb(255, 255, 255)", // Weißer Hintergrund
+      penColor: "rgb(0, 0, 0)", // Schwarze Stiftfarbe
+    });
+
+    // Funktion zum Anpassen der Canvas-Größe
+    function resizeCanvas() {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+      // Wichtig: Das Canvas muss eine definierte offsetWidth/offsetHeight haben (durch CSS)
+      // damit dies funktioniert.
+      if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) {
+        console.warn("#signature-pad hat keine definierte Breite/Höhe durch CSS. Setze Standardwerte.");
+        // Fallback, falls CSS nicht greift oder das Element noch nicht sichtbar ist.
+        // Diese Werte sollten Sie an Ihr Design anpassen.
+        canvas.style.width = "400px";
+        canvas.style.height = "200px";
+      }
+
+      // Physische Pixel des Canvas setzen
+      canvas.width = canvas.offsetWidth * ratio;
+      canvas.height = canvas.offsetHeight * ratio;
+
+      // CSS-Pixel (Anzeigegröße) beibehalten
+      canvas.style.width = canvas.offsetWidth + "px";
+      canvas.style.height = canvas.offsetHeight + "px";
+
+      // Kontext für High-DPI skalieren
+      canvas.getContext("2d").scale(ratio, ratio);
+
+      // Nach einer Größenänderung ist der Inhalt des Canvas leer.
+      // Wenn Daten im signatureDataInput wären, könnte man versuchen, sie neu zu zeichnen:
+      // if (signatureDataInput && signatureDataInput.value) {
+      //     signaturePad.fromDataURL(signatureDataInput.value);
+      // } else {
+      //     signaturePad.clear();
+      // }
+      // Fürs Erste einfach löschen:
+      signaturePad.clear();
+    }
+
+    // Canvas initial anpassen. Ein kleiner Timeout kann helfen,
+    // falls CSS-Dimensionen nicht sofort beim DOMContentLoaded verfügbar sind.
+    setTimeout(resizeCanvas, 100);
+
+    // Optional: Bei Fenstergrößenänderung erneut anpassen.
+    // ACHTUNG: Dies löscht die aktuelle Zeichnung. Nur aktivieren, wenn wirklich nötig.
+    // window.addEventListener('resize', resizeCanvas);
+
+    // Event Listener für den "Löschen"-Button
+    if (clearButton) {
+      clearButton.addEventListener("click", function () {
+        signaturePad.clear();
+        if (signatureDataInput) {
+          signatureDataInput.value = ""; // Verstecktes Feld leeren
+        }
+      });
+    }
+
+    // **WICHTIG für den nächsten Schritt (Datenübertragung):**
+    // Um die Daten beim Absenden des Formulars in das Feld 'id_signature_base64' zu bekommen,
+    // benötigen Sie einen Event Listener für das Formular-Submit-Ereignis.
+    // Das lassen wir hier, wie gewünscht, erstmal weg.
+    // Beispiel (für später):
+    /*
+    const form = canvas.closest('form');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            if (!signaturePad.isEmpty()) {
+                if (signatureDataInput) {
+                    signatureDataInput.value = signaturePad.toDataURL('image/png');
+                }
+            } else {
+                if (signatureDataInput) {
+                    signatureDataInput.value = '';
+                }
+            }
+        });
+    }
+    */
+  });
+</script>
 {% endblock page_scripts %}
 
 <!-- tab titles -->
@@ -82,53 +311,53 @@
 
 <!-- Content -->
 {% block content %}
+<script src="{% static 'vendor/libs/signature_pad/signature_pad.umd.min.js' %}"></script>
 
-<div class="bs-stepper reportWizard mt-6">
+<!-- skgnadrijgndifungdfng -->
+<div class="bs-stepper vertical wizard-modern wizard-modern-vertical-icons-example mt-6 reportWizard">
   <!-- wizard navigation -->
   <div class="bs-stepper-header">
-    <!-- wizard step -->
+    <!-- wizard step: basicData -->
     <div class="step" data-target="#basicData">
-      <button type="button" class="step-trigger">
-        <span class="bs-stepper-circle">1</span>
+      <button type="button" class="step-trigger" aria-selected="false">
+        <span class="bs-stepper-circle">
+          <i class="icon-base bx bx-detail"></i>
+        </span>
         <span class="bs-stepper-label">
-          <span class="bs-stepper-title">Basisdaten</span>
+          <span class="bs-stepper-title">Account Details</span>
           <span class="bs-stepper-subtitle">Setup Account Details</span>
         </span>
       </button>
     </div>
-    <!-- / wizard step -->
+    <!-- /wizard step -->
 
-    <div class="line">
-      <i class="icon-base bx bx-chevron-right scaleX-n1-rtl"></i>
-    </div>
-
-    <!-- wizard step -->
-    <div class="step" data-target="#details">
-      <button type="button" class="step-trigger">
-        <span class="bs-stepper-circle">2</span>
-        <span class="bs-stepper-label">
-          <span class="bs-stepper-title">Details</span>
-          <span class="bs-stepper-subtitle">Add personal info</span>
-        </span>
-      </button>
-    </div>
-    <!-- / wizard step -->
-
-    <div class="line">
-      <i class="icon-base bx bx-chevron-right scaleX-n1-rtl"></i>
-    </div>
-
-    <!-- wizard step -->
+    <!-- wizard step: accidentCause  -->
     <div class="step" data-target="#accidentCause">
-      <button type="button" class="step-trigger">
-        <span class="bs-stepper-circle">3</span>
+      <button type="button" class="step-trigger" aria-selected="false">
+        <span class="bs-stepper-circle">
+          <i class="icon-base bx bxl-instagram"></i>
+        </span>
         <span class="bs-stepper-label">
-          <span class="bs-stepper-title">Unfallhergang</span>
+          <span class="bs-stepper-title">Social Links</span>
           <span class="bs-stepper-subtitle">Add social links</span>
         </span>
       </button>
     </div>
-    <!-- / wizard step -->
+    <!-- wizard step -->
+
+    <!-- wizard step: details -->
+    <div class="step" data-target="#details">
+      <button type="button" class="step-trigger" aria-selected="false">
+        <span class="bs-stepper-circle">
+          <i class="icon-base bx bx-detail"></i>
+        </span>
+        <span class="bs-stepper-label">
+          <span class="bs-stepper-title">Account Details</span>
+          <span class="bs-stepper-subtitle">Setup Account Details</span>
+        </span>
+      </button>
+    </div>
+    <!-- /wizard step -->
   </div>
   <!-- / wizard navigation -->
 
@@ -145,30 +374,54 @@
         </div>
         <!-- / step header -->
 
-        <!-- form fields -->
-        <div class="row g-3">
-          {% for field in report_form_step_1 %}
-          <!-- field -->
-          <div class="col-sm-6">
-            <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
-            {{field}}
-          </div>
-          {% endfor %}
+        {% for field in report_form_step_1 %}
 
-          <!-- step buttons -->
-          <div class="col-12 d-flex justify-content-between">
-            <button class="btn btn-secondary btn-prev" disabled>
-              <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
-              <span class="align-middle d-sm-inline-block d-none">Previous</span>
-            </button>
-            <button class="btn btn-primary btn-next">
-              <span class="align-middle d-sm-inline-block d-none me-sm-2">Next</span>
-              <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
-            </button>
-          </div>
-          <!-- / step buttons -->
+        <!-- if checkbox test -->
+        {% if field.widget_type == "checkbox" %}
+        <div class="wizardFormField d-flex align-items-center gap-2">
+          {{field}}
+          <label class="form-label m-0" for="id_{{field.name}}">{{field.label}}</label>
         </div>
-        <!-- / form fields -->
+
+        {% elif field.name == 'signature_base64' %}
+        <div class="wizardFormField">
+          <div class="signature-container">
+            <label class="form-label m-0" for="id_{{field.name}}">Unterschrift</label>
+            <div>
+              <canvas id="signature-pad"></canvas>
+              {{ field }}
+            </div>
+            <div class="signature-button-group">
+              <button class="btn btn-label-primary" type="button" id="clear-signature-button">Löschen</button>
+            </div>
+          </div>
+        </div>
+
+        {% else %}
+
+        <!-- field -->
+        <div class="wizardFormField">
+          <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
+          {{field}}
+        </div>
+
+        {% endif %}
+        <!-- endif checkbox test -->
+
+        {% endfor %}
+
+        <!-- step buttons -->
+        <div class="col-12 d-flex justify-content-between mt-6">
+          <button class="btn btn-primary btn-prev" disabled>
+            <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
+            <span class="align-middle d-sm-inline-block d-none">Zurück</span>
+          </button>
+          <button class="btn btn-primary btn-next">
+            <span class="align-middle d-sm-inline-block d-none me-sm-2">Weiter</span>
+            <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
+          </button>
+        </div>
+        <!-- / step buttons -->
       </div>
       <!-- / Step 1 -->
 
@@ -181,41 +434,40 @@
         </div>
         <!-- / step header -->
 
-        <!-- form fields -->
-        <div class="row g-3">
-          {% for field in report_form_step_2 %}
+        {% for field in report_form_step_2 %}
 
-          <!-- if checkbox test -->
-          {% if field.widget_type == "checkbox" %}
-          <div class="col-sm-12 d-flex align-items-center gap-2">
-            {{field}}
-            <label class="form-label m-0" for="id_{{field.name}}">{{field.label}}</label>
-          </div>
-          {% else %}
-          <!-- field -->
-          <div class="col-sm-6">
-            <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
-            {{field}}
-          </div>
-          {% endif %}
-          <!-- endif checkbox test -->
-
-          {% endfor %}
-
-          <!-- step buttons -->
-          <div class="col-12 d-flex justify-content-between">
-            <button class="btn btn-secondary btn-prev" disabled>
-              <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
-              <span class="align-middle d-sm-inline-block d-none">Previous</span>
-            </button>
-            <button class="btn btn-primary btn-next">
-              <span class="align-middle d-sm-inline-block d-none me-sm-2">Next</span>
-              <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
-            </button>
-          </div>
-          <!-- / step buttons -->
+        <!-- if checkbox test -->
+        {% if field.widget_type == "checkbox" %}
+        <div class="wizardFormField d-flex align-items-center gap-2">
+          {{field}}
+          <label class="form-label m-0" for="id_{{field.name}}">{{field.label}}</label>
         </div>
-        <!-- / form fields -->
+
+        {% else %}
+
+        <!-- field -->
+        <div class="wizardFormField">
+          <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
+          {{field}}
+        </div>
+
+        {% endif %}
+        <!-- endif checkbox test -->
+
+        {% endfor %}
+
+        <!-- step buttons -->
+        <div class="col-12 d-flex justify-content-between mt-6">
+          <button class="btn btn-primary btn-prev">
+            <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
+            <span class="align-middle d-sm-inline-block d-none">Zurück</span>
+          </button>
+          <button class="btn btn-primary btn-next">
+            <span class="align-middle d-sm-inline-block d-none me-sm-2">Weiter</span>
+            <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
+          </button>
+        </div>
+        <!-- / step buttons -->
       </div>
       <!-- / Step 2 -->
 
@@ -228,41 +480,40 @@
         </div>
         <!-- / step header -->
 
-        <!-- form fields -->
-        <div class="row g-3">
-          {% for field in report_form_step_3 %}
+        {% for field in report_form_step_3 %}
 
-          <!-- if checkbox test -->
-          {% if field.widget_type == "checkbox" %}
-          <div class="col-sm-12 d-flex align-items-center gap-2">
-            {{field}}
-            <label class="form-label m-0" for="id_{{field.name}}">{{field.label}}</label>
-          </div>
-          {% else %}
-          <!-- field -->
-          <div class="col-sm-6">
-            <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
-            {{field}}
-          </div>
-          {% endif %}
-          <!-- endif checkbox test -->
-
-          {% endfor %}
-
-          <!-- step buttons -->
-          <div class="col-12 d-flex justify-content-between">
-            <button class="btn btn-secondary btn-prev" disabled>
-              <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
-              <span class="align-middle d-sm-inline-block d-none">Previous</span>
-            </button>
-            <button class="btn btn-primary btn-next">
-              <span class="align-middle d-sm-inline-block d-none me-sm-2">Next</span>
-              <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
-            </button>
-          </div>
-          <!-- / step buttons -->
+        <!-- if checkbox test -->
+        {% if field.widget_type == "checkbox" %}
+        <div class="wizardFormField d-flex align-items-center gap-2">
+          {{field}}
+          <label class="form-label m-0" for="id_{{field.name}}">{{field.label}}</label>
         </div>
-        <!-- / form fields -->
+
+        {% else %}
+
+        <!-- field -->
+        <div class="wizardFormField">
+          <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
+          {{field}}
+        </div>
+
+        {% endif %}
+        <!-- endif checkbox test -->
+
+        {% endfor %}
+
+        <!-- step buttons -->
+        <div class="col-12 d-flex justify-content-between mt-6">
+          <button class="btn btn-primary btn-prev">
+            <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
+            <span class="align-middle d-sm-inline-block d-none">Zurück</span>
+          </button>
+          <button class="btn btn-primary btn-next">
+            <span class="align-middle d-sm-inline-block d-none me-sm-2">Weiter</span>
+            <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
+          </button>
+        </div>
+        <!-- / step buttons -->
       </div>
       <!-- / Step 3 -->
     </form>
@@ -270,5 +521,4 @@
   </div>
   <!-- wizard content -->
 </div>
-
 {% endblock content %}

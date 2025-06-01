@@ -61,147 +61,6 @@ class ReportForm(ModelForm):
             field.widget.attrs.update({"placeholder": field.label})
 
 
-# Enthält Felder, die auf der ersten Seite des Formulars erscheinen sollen.
-class DamageReportStep1Form(forms.ModelForm):
-    signature_base64 = forms.CharField(
-        widget=forms.HiddenInput(),
-        required=False
-    )
-
-    class Meta:
-        model = DamageReport  # Das Modell, auf dem dieses Formular basiert
-
-        # Liste der Felder aus dem Modell, die in diesem Schritt angezeigt werden
-        fields = [
-            'person_or_company',
-            'company_name',
-            'first_name',
-            'last_name',
-            'accident_datetime',
-            # 'signature',
-        ]
-
-        labels = {
-            "person_or_company": "Privatperson/Firma",
-            "company_name": "Firmenname",
-            "first_name": "Vorname",
-            "last_name": "Nachname",
-            "accident_datetime": "Unfalldatum & -uhrzeit",
-            # 'signature': 'Unterschrift'
-        }
-
-        # Hier kannst du Widgets anpassen, wenn nötig (z.B. für das Datum)
-        widgets = {
-            'accident_datetime': forms.DateTimeInput(
-                attrs={'type': 'text', 'class': 'form-control datepicker accidentDatetime', 'placeholder': 'TT.MM.JJJJ HH:MM'},
-                format='%d.%m.%Y %H:%M'  # Optional: Definiert das Format
-            ),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super(DamageReportStep1Form, self).__init__(*args, **kwargs)
-
-        for name, field in self.fields.items():
-            field.widget.attrs.update({"placeholder": field.label})
-
-
-# Enthält Felder für persönliche Daten, Bankdaten, Versicherung und Fahrzeugdaten.
-class DamageReportStep2Form(forms.ModelForm):
-    class Meta:
-        model = DamageReport
-
-        fields = [
-            # Persönliche Daten
-            'address',
-            'email',
-            'phone_number',
-            # Bankdaten
-            'iban',
-            'bank_image',
-            # Versicherungsdaten
-            # Fahrzeugdaten
-            'plate_number',
-            'inspection',
-            'checkbook_exists',
-            'checkbook',
-            'leased',
-            'financed',
-        ]
-
-        labels = {
-            "address": "Adresse",
-            "email": "E-Mail-Adresse",
-            "phone_number": "Telefonnummer",
-            "iban": "IBAN",
-            "bank_image": "Foto der Bankkarte",
-            "plate_number": "Kennzeichen",
-            "inspection": "HU",
-            "checkbook_exists": "Scheckheft vorhanden",
-            "checkbook": "Schekheft Upload",
-            "leased": "Geleast",
-            "financed": "Finanziert"
-        }
-
-        widgets = {
-            'inspection': forms.DateInput(
-                attrs={'type': 'text', 'class': 'form-control datepicker inspection', 'placeholder': 'MM/JJJJ'},
-                format='%m/%Y'
-            ),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super(DamageReportStep2Form, self).__init__(*args, **kwargs)
-
-        for name, field in self.fields.items():
-            field.widget.attrs.update({"placeholder": field.label})
-
-
-# Enthält Felder für Unfallgegner und Unfallhergang.
-class DamageReportStep3Form(forms.ModelForm):
-    class Meta:
-        model = DamageReport
-
-        fields = [
-            # Unfallgegner
-            'opponent_plate_number',
-            'opponent_insurance_number',
-            'damage_number',
-            'has_witnesses',
-            'witness_textfield',
-            # Unfallfragebogen
-            'accident_location',
-            'accident_scenarios',
-            'accident_notes',
-        ]
-
-        labels = {
-            "opponent_plate_number": "Kennzeichen (Unfallgegner)",
-            "opponent_insurance_number": "Vers.-Nr. (Unfallgegner)",
-            "damage_number": "Schadensnummer",
-            "has_witnesses": "Gibt es Zeugen?",
-            "witness_textfield": "Zeugen Textfeld",
-            "accident_location": "Unfallort",
-            "accident_scenarios": "Zutreffende Unfallszenarien",
-            "accident_notes": "Unfallhergang",
-        }
-
-        widgets = {
-            'accident_scenarios': forms.CheckboxSelectMultiple(
-                attrs={'class': 'multiple-checkbox-group'}
-            ),
-            'accident_notes': forms.Textarea(attrs={'rows': 4}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super(DamageReportStep3Form, self).__init__(*args, **kwargs)
-
-        for name, field in self.fields.items():
-            field.widget.attrs.update({"placeholder": field.label})
-
-            if name == 'witness_textfield':
-                field.widget.attrs.update({"class": "hide"})
-
-
 class DamageReportStep4ImagesForm(forms.Form):
     # Hole die Choices direkt aus dem Modell, um Konsistenz zu gewährleisten
     IMAGE_VIEW_CHOICES_DICT = dict(DamageImage.IMAGE_TYPE_CHOICES)
@@ -228,12 +87,12 @@ class DamageReportStep4ImagesForm(forms.Form):
             )
 
 
-class DamageReportConfirmationForm(forms.Form):
-    # Absichtlich leer gelassen
-    pass
-
-
 class ReportForm_Step1(ModelForm):
+
+    signature_base64 = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False
+    )
 
     class Meta:
         model = DamageReport
@@ -330,13 +189,12 @@ class ReportForm_Step3(ModelForm):
             'opponent_plate_number',
             'opponent_insurance_number',
             'damage_number',
-            'accident_location',
-            # Unfallfragebogen
-            'accident_notes',
-            'accident_scenarios',
             'has_witnesses',
             'witness_textfield',
-
+            # Unfallfragebogen
+            'accident_location',
+            'accident_scenarios',
+            'accident_notes',
         ]
 
         labels = {

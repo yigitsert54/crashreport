@@ -1474,22 +1474,6 @@ li.ui-timepicker-selected,
 .bs-stepper .step.active .bs-stepper-label .bs-stepper-title {
   color: #333333;
 }
-.bs-stepper .step.crossed .step-trigger .bs-stepper-circle {
-  background-color: rgba(51 51 51 / 0.1) !important;
-  color: #333333 !important;
-}
-.bs-stepper .step.crossed .step-trigger .bs-stepper-icon svg {
-  fill: #333333 !important;
-}
-.bs-stepper .step.crossed .step-trigger .bs-stepper-icon i {
-  color: #333333 !important;
-}
-.bs-stepper.wizard-icons .step.crossed .bs-stepper-label {
-  color: #333333 !important;
-}
-.bs-stepper.wizard-icons .step.crossed + .line i {
-  color: #333333;
-}
 
 .app-chat .sidebar-body .chat-contact-list li.active {
   background-color: #333333;

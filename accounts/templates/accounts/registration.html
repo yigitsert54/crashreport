@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en" class="light-style layout-wide customizer-hide" dir="ltr" data-theme="theme-default" data-template="horizontal-menu-template" data-style="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+    <title>Registrieren</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon/favicon.ico' %}" />
+
+    <!-- all CDNs, fonts & icons -->
+    {% include 'xcdns.html' %}
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{% static 'vendor/css/rtl/core.css' %}" />
+    <link rel="stylesheet" href="{% static 'vendor/css/rtl/theme-default_updated.css' %}" />
+    <!-- <link rel="stylesheet" href="{% static 'css/demo.css' %}" /> -->
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}" />
+    <link rel="stylesheet" href="{% static 'vendor/libs/typeahead-js/typeahead.css' %}" />
+    <link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+    <link rel="stylesheet" href="{% static 'vendor/libs/animate-css/animate.css' %}" />
+
+    <!-- validation -->
+    <link rel="stylesheet" href="{% static 'vendor/libs/@form-validation/form-validation.css' %}" />
+
+    <!-- Page -->
+    <link rel="stylesheet" href="{% static 'vendor/css/pages/page-auth.css' %}" />
+
+    <!-- own login styles -->
+    <link rel="stylesheet" href="{% static 'custom/css/login_register.css' %}" />
+
+    <!-- Helpers -->
+    <script src="{% static 'vendor/js/helpers.js' %}"></script>
+
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="{% static 'js/config.js' %}"></script>
+  </head>
+
+  <body>
+    <!-- Content -->
+    <div class="container-xxl">
+      <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner">
+          <!-- Messages -->
+          {% if messages %} {% for message in messages %}
+          <div class="bs-toast toast-ex toast animate__animated my-2 fade {{message.tags}} animate__swing show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+              <i class="bx bx-bell d-block w-px-20 h-auto rounded me-2"></i>
+              <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">{{message}}</div>
+          </div>
+          {% endfor %} {% endif %}
+          <!-- / messages -->
+
+          <!-- Login container -->
+          <div class="card px-sm-6 px-0">
+            <div class="card-body">
+              <!-- Logo -->
+              <div class="logoContainer">
+                <img src="{% static 'img/branding/logo.svg' %}" class="logo" alt="" />
+              </div>
+              <!-- / Logo -->
+
+              <h4 class="mb-1">Jetzt registrieren! 🚀</h4>
+              <p class="mb-6">Bitte füllen Sie die Felder aus!</p>
+
+              <form id="formAuthentication" class="mb-6" action="{% url 'register' %}" method="POST">
+                {% csrf_token %}
+
+                <!-- Loop through the fields -->
+                {% for field in form %}
+                <!-- field container -->
+                <div class="mb-4">
+                  <!-- Label -->
+                  <label for="id_{{field.name}}" class="form-label">{{field.label}}</label>
+
+                  <!-- input -->
+                  {{field}}
+                </div>
+                {% endfor %}
+
+                <!-- submit login -->
+                <div class="mb-6">
+                  <button class="btn btn-primary d-grid w-100" type="submit">Registrieren</button>
+                </div>
+              </form>
+
+              <!-- Login -->
+              <p class="text-center">
+                <span>Du hast schon einen Account?</span>
+                <a href="{% url 'login' %}">
+                  <span>Einloggen!</span>
+                </a>
+              </p>
+            </div>
+          </div>
+          <!--/ Login container -->
+        </div>
+      </div>
+    </div>
+    <!-- / Content -->
+
+    <!-- Core Scripts -->
+    <script src="{% static 'vendor/libs/jquery/jquery.js' %}"></script>
+    <script src="{% static 'vendor/libs/popper/popper.js' %}"></script>
+    <script src="{% static 'vendor/js/bootstrap.js' %}"></script>
+    <script src="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+    <script src="{% static 'vendor/libs/hammer/hammer.js' %}"></script>
+    <script src="{% static 'vendor/libs/i18n/i18n.js' %}"></script>
+    <script src="{% static 'vendor/libs/typeahead-js/typeahead.js' %}"></script>
+    <script src="{% static 'vendor/js/menu.js' %}"></script>
+
+    <!-- endbuild -->
+
+    <!-- Vendors JS -->
+    <script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+
+    <!-- Main JS -->
+    <!-- <script src="{% static 'js/main.js' %}"></script> -->
+
+    <!-- Page JS -->
+    <script src="{% static 'js/dashboards-analytics.js' %}"></script>
+
+    <!-- Autosize textfield -->
+    <script src="{% static 'vendor/libs/autosize/autosize.js' %}"></script>
+
+    <!-- Message/Alert handler -->
+    <script src="{% static 'js/messages.js' %}"></script>
+
+    <!-- Vendors JS -->
+    <script src="{% static 'vendor/libs/@form-validation/popular.js' %}"></script>
+    <script src="{% static 'vendor/libs/@form-validation/bootstrap5.js' %}"></script>
+    <script src="{% static 'vendor/libs/@form-validation/auto-focus.js' %}"></script>
+
+    <!-- Page JS -->
+    <!-- <script src="{% static 'js/pages-auth.js' %}"></script> -->
+  </body>
+</html>

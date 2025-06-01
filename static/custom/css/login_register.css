@@ -1,0 +1,25 @@
+div.logoContainer {
+  width: 100%;
+}
+
+div.logoContainer img.logo {
+  width: 85%;
+  max-width: 330px;
+  margin-bottom: 1.5rem;
+}
+
+.toast-ex {
+  top: 2rem !important;
+  right: 2rem !important;
+  max-width: calc(100% - 4rem) !important;
+}
+
+.bg-danger.toast,
+.bg-danger.bs-toast {
+  background-color: rgba(255, 62, 29, 1) !important;
+}
+
+.bg-success.toast,
+.bg-success.bs-toast {
+  background-color: rgba(113, 221, 55, 1) !important;
+}

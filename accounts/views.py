@@ -75,7 +75,7 @@ def user_registration(request):
         "form": form
     }
 
-    return render(request, "accounts/login_register.html", context=context)
+    return render(request, "accounts/registration.html", context=context)
 
 
 def user_login(request):
@@ -128,7 +128,7 @@ def user_login(request):
         "form": form
     }
 
-    return render(request, "accounts/login_register.html", context=context)
+    return render(request, "accounts/login.html")
 
 
 @login_required(login_url="login")
