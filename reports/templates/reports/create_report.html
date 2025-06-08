@@ -34,6 +34,49 @@
   .wizardFormField.hide {
     display: none;
   }
+
+  .light-style .bs-stepper .bs-stepper-header .step:not(.active) .bs-stepper-subtitle,
+  .bs-stepper .bs-stepper-header .step .step-trigger .bs-stepper-label .bs-stepper-subtitle {
+    white-space: normal !important;
+    word-break: break-word;
+  }
+
+  div#witness-form .form-control {
+    width: auto;
+  }
+
+  .dropzone {
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .dropzone.bg-light {
+    background-color: #f8f9fa !important;
+    border-color: #696cff !important;
+  }
+
+  .dropzone-wrapper {
+    position: relative;
+  }
+
+  .dropzone-input {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .uploadLine .imageContainer {
+    width: 33%;
+  }
+
+  .uploadLine .imageContainer img {
+    width: 100%;
+  }
 </style>
 
 <!-- signature pad stylings -->
@@ -304,6 +347,226 @@
     */
   });
 </script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC7KR7tSiM_BfzUc8MfGC0WADHVFH8XdNE&libraries=places&callback=initAutocomplete" async defer></script>
+
+<script>
+  function initAutocomplete() {
+    // Feld 1: Adresse
+    const addressInput = document.getElementById("id_address");
+    const addressAutocomplete = new google.maps.places.Autocomplete(addressInput, {
+      fields: ["address_components", "geometry", "icon", "name"],
+    });
+
+    // Feld 2: Unfallort
+    const accidentInput = document.getElementById("id_accident_location");
+    const accidentAutocomplete = new google.maps.places.Autocomplete(accidentInput, {
+      // Hier könntest du andere Optionen festlegen, falls nötig
+      // z.B. die Suche auf Deutschland beschränken
+      componentRestrictions: { country: "de" },
+      fields: ["address_components", "geometry", "icon", "name"],
+    });
+
+    // Optional: Event-Listener für das Adressfeld
+    addressAutocomplete.addListener("place_changed", () => {
+      const place = addressAutocomplete.getPlace();
+      console.log("Ausgewählte Adresse:", place);
+    });
+
+    // Optional: Event-Listener für das Unfallort-Feld
+    accidentAutocomplete.addListener("place_changed", () => {
+      const place = accidentAutocomplete.getPlace();
+      console.log("Ausgewählter Unfallort:", place);
+    });
+  }
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Checkbox und Witness-UI
+    const witnessCheckbox = document.getElementById("id_has_witnesses");
+    const witnessTextfield = document.getElementById("id_witness_textfield");
+
+    let witnessUI = null;
+    let witnesses = [];
+
+    function updateWitnessTextfield() {
+      // Synchronisiere die unsichtbare Textarea für das Backend
+      if (witnessTextfield) {
+        witnessTextfield.value = witnesses.map((w) => [w.name, w.address, w.phone].filter(Boolean).join(" | ")).join("\n");
+      }
+    }
+
+    function renderWitnessList() {
+      const listDiv = document.getElementById("witness-list");
+      if (!listDiv) return;
+      listDiv.innerHTML = "";
+      witnesses.forEach((w, idx) => {
+        const entry = document.createElement("div");
+        entry.className = "witness-entry mb-1";
+        entry.innerHTML = `
+          <span><b>${w.name || "-"}</b> | ${w.address || "-"} | ${w.phone || "-"}</span>
+          <button type="button" class="btn btn-sm btn-outline-secondary ms-2 edit-witness-btn" data-idx="${idx}">Bearbeiten</button>
+          <button type="button" class="btn btn-sm btn-outline-danger ms-1 remove-witness-btn" data-idx="${idx}">Entfernen</button>
+        `;
+        listDiv.appendChild(entry);
+      });
+    }
+
+    function createWitnessUI() {
+      if (witnessUI) return witnessUI;
+      witnessUI = document.createElement("div");
+      witnessUI.id = "witness-ui";
+      witnessUI.innerHTML = `
+        <div id="witness-list" class="mt-2"></div>
+        <div id="witness-form" style="display:none; margin-bottom:1rem;">
+          <div class="d-flex gap-2 align-items-end flex-wrap">
+            <input type="text" class="form-control mb-0" id="witness-name" placeholder="Name des Zeugen" style="min-width: 160px;">
+            <input type="text" class="form-control mb-0" id="witness-address" placeholder="Adresse" style="min-width: 180px;">
+            <input type="text" class="form-control mb-0" id="witness-phone" placeholder="Telefonnummer" style="min-width: 140px;">
+            <button type="button" class="btn btn-primary" id="confirm-witness-btn">Bestätigen</button>
+            <button type="button" class="btn btn-outline-secondary ms-2" id="cancel-witness-btn" style="display:none;">Abbrechen</button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary mb-2" id="add-witness-btn">Zeuge hinzufügen</button>
+      `;
+
+      // ENTER-Handler für witness-form
+      setTimeout(() => {
+        const witnessForm = witnessUI.querySelector("#witness-form");
+        if (witnessForm) {
+          witnessForm.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              document.getElementById("confirm-witness-btn").click();
+            }
+          });
+        }
+      }, 0);
+
+      return witnessUI;
+    }
+
+    function showWitnessUI(show) {
+      const checkboxDiv = witnessCheckbox.closest(".wizardFormField");
+      if (show) {
+        if (!document.getElementById("witness-ui")) {
+          checkboxDiv.parentNode.insertBefore(createWitnessUI(), checkboxDiv.nextSibling);
+        }
+        renderWitnessList();
+      } else {
+        if (document.getElementById("witness-ui")) {
+          document.getElementById("witness-ui").remove();
+        }
+      }
+    }
+
+    let editIndex = null;
+
+    if (witnessCheckbox) {
+      witnessCheckbox.addEventListener("change", function () {
+        showWitnessUI(this.checked);
+      });
+      showWitnessUI(witnessCheckbox.checked);
+    }
+
+    document.body.addEventListener("click", function (e) {
+      // Zeuge hinzufügen
+      if (e.target && e.target.id === "add-witness-btn") {
+        document.getElementById("witness-form").style.display = "block";
+        document.getElementById("witness-name").value = "";
+        document.getElementById("witness-address").value = "";
+        document.getElementById("witness-phone").value = "";
+        document.getElementById("cancel-witness-btn").style.display = "none";
+        editIndex = null;
+      }
+      // Zeuge bestätigen (neu oder bearbeitet)
+      if (e.target && e.target.id === "confirm-witness-btn") {
+        const name = document.getElementById("witness-name").value.trim();
+        const address = document.getElementById("witness-address").value.trim();
+        const phone = document.getElementById("witness-phone").value.trim();
+        if (!name && !address && !phone) return;
+        if (editIndex !== null) {
+          witnesses[editIndex] = { name, address, phone };
+          editIndex = null;
+        } else {
+          witnesses.push({ name, address, phone });
+        }
+        updateWitnessTextfield();
+        renderWitnessList();
+        document.getElementById("witness-form").style.display = "none";
+      }
+      // Zeuge entfernen
+      if (e.target && e.target.classList.contains("remove-witness-btn")) {
+        const idx = parseInt(e.target.getAttribute("data-idx"));
+        witnesses.splice(idx, 1);
+        updateWitnessTextfield();
+        renderWitnessList();
+      }
+      // Zeuge bearbeiten
+      if (e.target && e.target.classList.contains("edit-witness-btn")) {
+        const idx = parseInt(e.target.getAttribute("data-idx"));
+        const w = witnesses[idx];
+        document.getElementById("witness-name").value = w.name;
+        document.getElementById("witness-address").value = w.address;
+        document.getElementById("witness-phone").value = w.phone;
+        document.getElementById("witness-form").style.display = "block";
+        document.getElementById("cancel-witness-btn").style.display = "inline-block";
+        editIndex = idx;
+      }
+      // Abbrechen
+      if (e.target && e.target.id === "cancel-witness-btn") {
+        document.getElementById("witness-form").style.display = "none";
+        editIndex = null;
+      }
+    });
+  });
+</script>
+
+<script>
+  function previewDropzoneImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = "block";
+      };
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      preview.src = "#";
+      preview.style.display = "none";
+    }
+  }
+
+  // Dropzone-Click auf das Input weiterleiten
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".dropzone").forEach(function (dropzone) {
+      dropzone.addEventListener("click", function () {
+        const input = this.parentNode.querySelector(".dropzone-input");
+        if (input) input.click();
+      });
+      // Drag & Drop Support
+      dropzone.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        this.classList.add("bg-light");
+      });
+      dropzone.addEventListener("dragleave", function (e) {
+        e.preventDefault();
+        this.classList.remove("bg-light");
+      });
+      dropzone.addEventListener("drop", function (e) {
+        e.preventDefault();
+        this.classList.remove("bg-light");
+        const input = this.parentNode.querySelector(".dropzone-input");
+        if (input && e.dataTransfer.files.length) {
+          input.files = e.dataTransfer.files;
+          input.dispatchEvent(new Event("change"));
+        }
+      });
+    });
+  });
+</script>
 {% endblock page_scripts %}
 
 <!-- tab titles -->
@@ -311,9 +574,7 @@
 
 <!-- Content -->
 {% block content %}
-<script src="{% static 'vendor/libs/signature_pad/signature_pad.umd.min.js' %}"></script>
 
-<!-- skgnadrijgndifungdfng -->
 <div class="bs-stepper vertical wizard-modern wizard-modern-vertical-icons-example mt-6 reportWizard">
   <!-- wizard navigation -->
   <div class="bs-stepper-header">
@@ -324,8 +585,22 @@
           <i class="icon-base bx bx-detail"></i>
         </span>
         <span class="bs-stepper-label">
-          <span class="bs-stepper-title">Account Details</span>
-          <span class="bs-stepper-subtitle">Setup Account Details</span>
+          <span class="bs-stepper-title">Basisdaten</span>
+          <span class="bs-stepper-subtitle">Persönliche Informationen</span>
+        </span>
+      </button>
+    </div>
+    <!-- /wizard step -->
+
+    <!-- wizard step: details -->
+    <div class="step" data-target="#details">
+      <button type="button" class="step-trigger" aria-selected="false">
+        <span class="bs-stepper-circle">
+          <i class="icon-base bx bx-detail"></i>
+        </span>
+        <span class="bs-stepper-label">
+          <span class="bs-stepper-title">Fahrzeug- & Bankdaten</span>
+          <span class="bs-stepper-subtitle">Daten zum Fahrzeug und zur Bankverbindung</span>
         </span>
       </button>
     </div>
@@ -338,22 +613,22 @@
           <i class="icon-base bx bxl-instagram"></i>
         </span>
         <span class="bs-stepper-label">
-          <span class="bs-stepper-title">Social Links</span>
-          <span class="bs-stepper-subtitle">Add social links</span>
+          <span class="bs-stepper-title">Unfallhergang</span>
+          <span class="bs-stepper-subtitle">Angaben zum Unfallhergang und Zeugen</span>
         </span>
       </button>
     </div>
     <!-- wizard step -->
 
-    <!-- wizard step: details -->
-    <div class="step" data-target="#details">
+    <!-- wizard step: vehicleImages -->
+    <div class="step" data-target="#vehicleImages">
       <button type="button" class="step-trigger" aria-selected="false">
         <span class="bs-stepper-circle">
-          <i class="icon-base bx bx-detail"></i>
+          <i class="icon-base bx bx-camera"></i>
         </span>
         <span class="bs-stepper-label">
-          <span class="bs-stepper-title">Account Details</span>
-          <span class="bs-stepper-subtitle">Setup Account Details</span>
+          <span class="bs-stepper-title">Fahrzeugbilder</span>
+          <span class="bs-stepper-subtitle">Bilder hochladen</span>
         </span>
       </button>
     </div>
@@ -370,7 +645,7 @@
         <!-- step header -->
         <div class="content-header mb-4">
           <h6 class="mb-0">Basisdaten</h6>
-          <small>Enter Your Account Details.</small>
+          <small>Füllen Sie Ihre persönlichen Angaben aus.</small>
         </div>
         <!-- / step header -->
 
@@ -430,7 +705,7 @@
         <!-- step header -->
         <div class="content-header mb-4">
           <h6 class="mb-0">Details</h6>
-          <small>Enter Your Account Details.</small>
+          <small>Bitte tragen Sie die Fahrzeug- und Zahlungsdaten ein.</small>
         </div>
         <!-- / step header -->
 
@@ -476,7 +751,7 @@
         <!-- step header -->
         <div class="content-header mb-4">
           <h6 class="mb-0">Unfallhergang</h6>
-          <small>Enter Your Account Details.</small>
+          <small>Geben Sie Details zum Unfall und zu Zeugen an.</small>
         </div>
         <!-- / step header -->
 
@@ -516,6 +791,52 @@
         <!-- / step buttons -->
       </div>
       <!-- / Step 3 -->
+
+      <!-- Step 4 -->
+      <div id="vehicleImages" class="content">
+        <div class="content-header mb-4">
+          <h6 class="mb-0">Fahrzeugbilder hochladen</h6>
+          <small>Bitte laden Sie Bilder Ihres Fahrzeugs aus den folgenden Ansichten hoch:</small>
+        </div>
+        {% for field in report_form_step_4 %}
+        <div class="wizardFormField mb-4 row align-items-center">
+          <div class="col">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <div class="d-flex align-items-center gap-3 uploadLine">
+              <div class="flex-grow-1 dropzone-wrapper" style="position: relative">
+                <input
+                  type="file"
+                  name="{{ field.name }}"
+                  id="{{ field.id_for_label }}"
+                  class="dropzone-input"
+                  accept="image/*"
+                  style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer"
+                  onchange="previewDropzoneImage(this, 'preview-{{ field.name }}')" />
+                <div class="dropzone border border-2 border-dashed rounded p-3 text-center" style="min-height: 120px">
+                  <i class="bx bx-cloud-upload fs-1 mb-2"></i>
+                  <p class="mb-0">Datei hier ablegen oder klicken zum Hochladen</p>
+                  <img id="preview-{{ field.name }}" src="#" alt="Vorschau" style="display: none; max-width: 100%; max-height: 100px; margin-top: 10px" />
+                </div>
+              </div>
+              <div class="text-center imageContainer">
+                <img src="{% static 'img/vehicle_views/' %}{{ field.name }}.jpeg" alt="Beispiel {{ field.label }}" class="img-fluid border rounded" style="object-fit: contain" />
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        <div class="col-12 d-flex justify-content-between mt-6">
+          <button class="btn btn-primary btn-prev">
+            <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
+            <span class="align-middle d-sm-inline-block d-none">Zurück</span>
+          </button>
+          <button class="btn btn-primary btn-next">
+            <span class="align-middle d-sm-inline-block d-none me-sm-2">Weiter</span>
+            <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
+          </button>
+        </div>
+      </div>
+      <!-- / Step 4 -->
     </form>
     <!--  -->
   </div>

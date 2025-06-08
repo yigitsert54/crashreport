@@ -17,6 +17,7 @@ from .forms import (
     ReportForm_Step1,
     ReportForm_Step2,
     ReportForm_Step3,
+    ReportForm_Step4
 )
 
 # Import the WizardView.
@@ -58,6 +59,7 @@ def create_report_initial(request):
     report_form_step_1 = ReportForm_Step1()
     report_form_step_2 = ReportForm_Step2()
     report_form_step_3 = ReportForm_Step3()
+    report_form_step_4 = ReportForm_Step4()
 
     # Handle POST request
     if request.method == "POST":
@@ -134,7 +136,7 @@ def create_report_initial(request):
         "report_form_step_1": report_form_step_1,
         "report_form_step_2": report_form_step_2,
         "report_form_step_3": report_form_step_3,
-
+        "report_form_step_4": report_form_step_4,
     }
 
     return render(request, 'reports/create_report.html', context=context)

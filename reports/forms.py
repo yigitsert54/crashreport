@@ -229,3 +229,21 @@ class ReportForm_Step3(ModelForm):
             if isinstance(field.widget, forms.CheckboxSelectMultiple):
                 # CSS-Klasse für Checkboxen setzen (überschreibt 'form-control')
                 field.widget.attrs.update({"class": "form-check-input"})
+
+
+class ReportForm_Step4(forms.Form):
+    # Choices aus dem Modell holen
+    IMAGE_VIEW_CHOICES = DamageImage.IMAGE_TYPE_CHOICES
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Für jede Choice ein ImageField dynamisch erzeugen
+        for key, label in self.IMAGE_VIEW_CHOICES:
+            self.fields[f'image_{key}'] = forms.ImageField(
+                label=label,
+                required=False,
+                widget=forms.ClearableFileInput(attrs={
+                    'class': 'form-control-file',
+                    'accept': 'image/*'
+                })
+            )

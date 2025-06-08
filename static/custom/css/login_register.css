@@ -3,8 +3,7 @@ div.logoContainer {
 }
 
 div.logoContainer img.logo {
-  width: 85%;
-  max-width: 330px;
+  width: 100%;
   margin-bottom: 1.5rem;
 }
 
