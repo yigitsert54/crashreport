@@ -1,0 +1,201 @@
+{% load static %}
+
+<style>
+  div#id_accident_scenarios {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 0.7rem 1.2rem;
+    padding-top: 0.5rem;
+  }
+
+  #id_accident_scenarios > div > label {
+    display: flex;
+    gap: 0.5rem;
+  }
+</style>
+
+<div id="accidentCause" class="content">
+  <!-- step header -->
+  <div class="content-header mb-4">
+    <h6 class="mb-0">Unfallhergang</h6>
+    <small>Geben Sie Details zum Unfall und zu Zeugen an.</small>
+  </div>
+  <!-- / step header -->
+
+  {% for field in report_form_step_3 %}
+
+  <!-- if checkbox test -->
+  {% if field.widget_type == "checkbox" %}
+  <div class="wizardFormField d-flex align-items-center gap-2">
+    {{field}}
+    <label class="form-label m-0" for="id_{{field.name}}">{{field.label}}</label>
+  </div>
+
+  {% else %}
+
+  <!-- field -->
+  <div class="wizardFormField">
+    <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
+    {{field}}
+  </div>
+
+  {% endif %}
+  <!-- endif checkbox test -->
+
+  {% endfor %}
+
+  <!-- step buttons -->
+  <div class="col-12 d-flex justify-content-between mt-6">
+    <button class="btn btn-primary btn-prev" type="button">
+      <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
+      <span class="align-middle d-sm-inline-block d-none">Zurück</span>
+    </button>
+    <button class="btn btn-primary btn-next" type="button">
+      <span class="align-middle d-sm-inline-block d-none me-sm-2">Weiter</span>
+      <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
+    </button>
+  </div>
+  <!-- / step buttons -->
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Checkbox und Witness-UI
+    const witnessCheckbox = document.getElementById("id_has_witnesses");
+    const witnessTextfield = document.getElementById("id_witness_textfield");
+
+    let witnessUI = null;
+    let witnesses = [];
+
+    function updateWitnessTextfield() {
+      // Synchronisiere die unsichtbare Textarea für das Backend
+      if (witnessTextfield) {
+        witnessTextfield.value = witnesses.map((w) => [w.name, w.address, w.phone].filter(Boolean).join(" | ")).join("\n");
+      }
+    }
+
+    function renderWitnessList() {
+      const listDiv = document.getElementById("witness-list");
+      if (!listDiv) return;
+      listDiv.innerHTML = "";
+      witnesses.forEach((w, idx) => {
+        const entry = document.createElement("div");
+        entry.className = "witness-entry mb-1";
+        entry.innerHTML = `
+          <span><b>${w.name || "-"}</b> | ${w.address || "-"} | ${w.phone || "-"}</span>
+          <button type="button" class="btn btn-sm btn-outline-secondary ms-2 edit-witness-btn" data-idx="${idx}">Bearbeiten</button>
+          <button type="button" class="btn btn-sm btn-outline-danger ms-1 remove-witness-btn" data-idx="${idx}">Entfernen</button>
+        `;
+        listDiv.appendChild(entry);
+      });
+    }
+
+    function createWitnessUI() {
+      if (witnessUI) return witnessUI;
+      witnessUI = document.createElement("div");
+      witnessUI.id = "witness-ui";
+      witnessUI.innerHTML = `
+        <div id="witness-list" class="mt-2"></div>
+        <div id="witness-form" style="display:none; margin-bottom:1rem;">
+          <div class="d-flex gap-2 align-items-end flex-wrap">
+            <input type="text" class="form-control mb-0" id="witness-name" placeholder="Name des Zeugen" style="min-width: 160px;">
+            <input type="text" class="form-control mb-0" id="witness-address" placeholder="Adresse" style="min-width: 180px;">
+            <input type="text" class="form-control mb-0" id="witness-phone" placeholder="Telefonnummer" style="min-width: 140px;">
+            <button type="button" class="btn btn-primary" id="confirm-witness-btn">Bestätigen</button>
+            <button type="button" class="btn btn-outline-secondary ms-2" id="cancel-witness-btn" style="display:none;">Abbrechen</button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary mb-2" id="add-witness-btn">Zeuge hinzufügen</button>
+      `;
+
+      // ENTER-Handler für witness-form
+      setTimeout(() => {
+        const witnessForm = witnessUI.querySelector("#witness-form");
+        if (witnessForm) {
+          witnessForm.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              document.getElementById("confirm-witness-btn").click();
+            }
+          });
+        }
+      }, 0);
+
+      return witnessUI;
+    }
+
+    function showWitnessUI(show) {
+      const checkboxDiv = witnessCheckbox.closest(".wizardFormField");
+      if (show) {
+        if (!document.getElementById("witness-ui")) {
+          checkboxDiv.parentNode.insertBefore(createWitnessUI(), checkboxDiv.nextSibling);
+        }
+        renderWitnessList();
+      } else {
+        if (document.getElementById("witness-ui")) {
+          document.getElementById("witness-ui").remove();
+        }
+      }
+    }
+
+    let editIndex = null;
+
+    if (witnessCheckbox) {
+      witnessCheckbox.addEventListener("change", function () {
+        showWitnessUI(this.checked);
+      });
+      showWitnessUI(witnessCheckbox.checked);
+    }
+
+    document.body.addEventListener("click", function (e) {
+      // Zeuge hinzufügen
+      if (e.target && e.target.id === "add-witness-btn") {
+        document.getElementById("witness-form").style.display = "block";
+        document.getElementById("witness-name").value = "";
+        document.getElementById("witness-address").value = "";
+        document.getElementById("witness-phone").value = "";
+        document.getElementById("cancel-witness-btn").style.display = "none";
+        editIndex = null;
+      }
+      // Zeuge bestätigen (neu oder bearbeitet)
+      if (e.target && e.target.id === "confirm-witness-btn") {
+        const name = document.getElementById("witness-name").value.trim();
+        const address = document.getElementById("witness-address").value.trim();
+        const phone = document.getElementById("witness-phone").value.trim();
+        if (!name && !address && !phone) return;
+        if (editIndex !== null) {
+          witnesses[editIndex] = { name, address, phone };
+          editIndex = null;
+        } else {
+          witnesses.push({ name, address, phone });
+        }
+        updateWitnessTextfield();
+        renderWitnessList();
+        document.getElementById("witness-form").style.display = "none";
+      }
+      // Zeuge entfernen
+      if (e.target && e.target.classList.contains("remove-witness-btn")) {
+        const idx = parseInt(e.target.getAttribute("data-idx"));
+        witnesses.splice(idx, 1);
+        updateWitnessTextfield();
+        renderWitnessList();
+      }
+      // Zeuge bearbeiten
+      if (e.target && e.target.classList.contains("edit-witness-btn")) {
+        const idx = parseInt(e.target.getAttribute("data-idx"));
+        const w = witnesses[idx];
+        document.getElementById("witness-name").value = w.name;
+        document.getElementById("witness-address").value = w.address;
+        document.getElementById("witness-phone").value = w.phone;
+        document.getElementById("witness-form").style.display = "block";
+        document.getElementById("cancel-witness-btn").style.display = "inline-block";
+        editIndex = idx;
+      }
+      // Abbrechen
+      if (e.target && e.target.id === "cancel-witness-btn") {
+        document.getElementById("witness-form").style.display = "none";
+        editIndex = null;
+      }
+    });
+  });
+</script>

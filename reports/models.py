@@ -5,6 +5,7 @@ import uuid
 
 # bibs
 from datetime import datetime
+from django.utils import timezone
 
 # null=True means, it is not required
 # blank=True is for the form, it means we are allowed to submit a form with this field empty
@@ -30,6 +31,7 @@ class DamageReport(models.Model):
     """Hier werden die angelegten Unfallberichte angezeigt."""
 
     workshop = models.ForeignKey(WorkshopData, on_delete=models.CASCADE, null=True, blank=True, related_name='reports')
+    autoixpert_id = models.CharField(max_length=50, null=True, blank=True, verbose_name="Autoixpert ID")
 
     PERSON_CHOICES = [
         ('private', 'Privatperson'),
@@ -58,7 +60,7 @@ class DamageReport(models.Model):
 
     # Fahrzeugdaten
     plate_number = models.CharField(max_length=12, null=True, blank=True, verbose_name="Kennzeichen")
-    inspection = models.DateField(null=True, blank=True, verbose_name="HU")
+    inspection = models.CharField(max_length=70, null=True, blank=True, verbose_name="HU (MM/YYYY)")
     checkbook_exists = models.BooleanField(blank=True, default=False, verbose_name="Scheckheft vorhanden")
     checkbook = models.FileField(upload_to="reports/checkbooks",
                                  null=True, blank=True, help_text="Schekheft Upload")
@@ -99,7 +101,8 @@ class DamageReport(models.Model):
     @property
     def accident_date_string(self):
         if self.accident_datetime:
-            return self.accident_datetime.strftime("%d.%m.%Y")
+            local_dt = timezone.localtime(self.accident_datetime)
+            return local_dt.strftime("%d.%m.%Y")
         else:
             return ""
 
@@ -108,14 +111,40 @@ class DamageReport(models.Model):
         if self.created:
             return self.created.strftime("%d.%m.%Y")
 
+    @property
+    def inspection_string(self):
+        if self.inspection:
+            # Create inspection date from string (with day as 1st of the month)
+            inspection_date = datetime.strptime(self.inspection, "%m/%Y")
+
+            # Set day to 1st of the month
+            inspection_date = inspection_date.replace(day=1)
+
+            return inspection_date.strftime("%Y-%m-%d")
+
+        else:
+            return None
+
+    @property
+    def accident_notes_string(self):
+
+        final_notes = ""
+
+        if self.accident_notes:
+            final_notes += self.accident_notes + "<br><br>"
+
+        for scenario in self.accident_scenarios.all():
+            final_notes += f"- {scenario.scenario}<br>"
+
+        return final_notes.strip()
+
 
 @sorted_verbose_name(position=2, database_display_name="Zeugen")  # Position anpassen
 class Witness(models.Model):
     """Speichert Daten zu einzelnen Zeugen eines Unfalls."""
     damage_report = models.ForeignKey(DamageReport, on_delete=models.CASCADE,
                                       related_name='witnesses', verbose_name="Zugehöriger Schadensbericht")
-    first_name = models.CharField(max_length=100, verbose_name="Vorname")
-    last_name = models.CharField(max_length=100, verbose_name="Nachname")
+    name = models.CharField(max_length=100, verbose_name="Name")
     address = models.CharField(max_length=255, blank=True, null=True, verbose_name="Adresse")
     phone_number = models.CharField(max_length=50, blank=True, null=True, verbose_name="Telefonnummer")
     # Optional: email = models.EmailField(max_length=150, blank=True, null=True, verbose_name="E-Mail")
@@ -124,7 +153,7 @@ class Witness(models.Model):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} (Zeuge für Bericht {self.damage_report})"
+        return f"{self.name} (Zeuge für Bericht {self.damage_report})"
 
     class Meta:
         ordering = ['damage_report', 'created']
@@ -144,12 +173,13 @@ class DamageImage(models.Model):
                                       related_name='images', verbose_name="Schadensbericht")
     image = models.ImageField(upload_to='damage_reports/%Y/%m/%d/', verbose_name="Bild")
     image_view = models.CharField(max_length=30, choices=IMAGE_TYPE_CHOICES, default='other', verbose_name="Bildansicht")
+    autoixpert_id = models.CharField(max_length=50, null=True, blank=True, verbose_name="Autoixpert ID")
 
     created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
 
     def __str__(self):
-        return f"{self.damage_report} - Ansicht: {self.image_view}"
+        return f"Report: {self.damage_report.id} - Ansicht: {self.image_view} - Autoixpert-Bild-ID: {self.autoixpert_id}"
 
     class Meta:
 

@@ -28,7 +28,7 @@ class DamageImageInline(admin.TabularInline):  # oder StackedInline
 class WitnessInline(admin.TabularInline):  # Oder StackedInline
     model = Witness
     extra = 0  # Keine leeren Formulare initial anzeigen
-    fields = ('first_name', 'last_name', 'address', 'phone_number')
+    fields = ('name', 'address', 'phone_number')
 
 
 @changelist_view(model_title="Schadensberichte")
@@ -100,3 +100,6 @@ class DamageReportAdmin(admin.ModelAdmin):
 class AccidentScenarioOptionAdmin(admin.ModelAdmin):
 
     change_list_template = 'admin/change_list.html'
+
+
+admin.site.register(Witness)

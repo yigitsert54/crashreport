@@ -1,0 +1,198 @@
+{% load static %}
+
+<!-- signature pad stylings -->
+<style>
+  #signature-pad {
+    border: 1px solid #ced4da; /* Wie andere Inputs */
+    border-radius: 4px; /* Wie andere Inputs */
+    background-color: #fff;
+    cursor: crosshair;
+    touch-action: none; /* Wichtig für Touch-Geräte */
+    width: 100%; /* Nimm die volle Breite ein */
+    height: 200px; /* Passe die Höhe an */
+    display: block; /* Verhindert extra Platz unter dem Canvas */
+  }
+
+  .signature-button-group {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+</style>
+
+<div id="basicData" class="content">
+  <!-- step header -->
+  <div class="content-header mb-4">
+    <h6 class="mb-0">Basisdaten</h6>
+    <small>Füllen Sie Ihre persönlichen Angaben aus.</small>
+  </div>
+  <!-- / step header -->
+
+  {% for field in report_form_step_1 %}
+
+  <!-- if checkbox test -->
+  {% if field.widget_type == "checkbox" %}
+  <div class="wizardFormField d-flex align-items-center gap-2">
+    {{field}}
+    <label class="form-label m-0" for="id_{{field.name}}">{{field.label}}</label>
+  </div>
+
+  {% elif field.name == 'signature_base64' %}
+  <!-- Check if its not editing -->
+  {% if not editing %}
+  <div class="wizardFormField">
+    <div class="signature-container">
+      <label class="form-label m-0" for="id_{{field.name}}">Unterschrift</label>
+      <div>
+        <canvas id="signature-pad"></canvas>
+        {{ field }}
+      </div>
+      <div class="signature-button-group">
+        <button class="btn btn-label-primary" type="button" id="clear-signature-button">Löschen</button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <!-- not editing -->
+
+  {% else %}
+
+  <!-- field -->
+  <div class="wizardFormField">
+    <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
+    {{field}}
+  </div>
+
+  {% endif %}
+  <!-- endif checkbox test -->
+
+  {% endfor %}
+
+  <!-- step buttons -->
+  <div class="col-12 d-flex justify-content-between mt-6">
+    <button class="btn btn-primary btn-prev" type="button" disabled>
+      <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
+      <span class="align-middle d-sm-inline-block d-none">Zurück</span>
+    </button>
+    <button class="btn btn-primary btn-next" type="button">
+      <span class="align-middle d-sm-inline-block d-none me-sm-2">Weiter</span>
+      <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
+    </button>
+  </div>
+  <!-- / step buttons -->
+</div>
+
+{% if not editing %}
+<!-- Signature Pad -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Überprüfen, ob SignaturePad geladen wurde
+    if (typeof SignaturePad === "undefined") {
+      console.error("SignaturePad konnte nicht geladen werden!");
+      return;
+    }
+
+    const canvas = document.getElementById("signature-pad");
+    const signatureDataInput = document.getElementById("id_signature_base64");
+    const signaturePad = new SignaturePad(canvas, {
+      backgroundColor: "rgb(255, 255, 255)",
+      penColor: "rgb(0, 0, 0)",
+    });
+
+    // Funktion zum Anpassen der Canvas-Größe
+    function resizeCanvas() {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+      if (canvas.offsetWidth === 0 || canvas.offsetHeight === 0) {
+        canvas.style.width = "400px";
+        canvas.style.height = "200px";
+      }
+
+      canvas.width = canvas.offsetWidth * ratio;
+      canvas.height = canvas.offsetHeight * ratio;
+      canvas.style.width = canvas.offsetWidth + "px";
+      canvas.style.height = canvas.offsetHeight + "px";
+      canvas.getContext("2d").scale(ratio, ratio);
+
+      // Nur laden, nicht direkt wieder löschen!
+      if (signatureDataInput && signatureDataInput.value) {
+        signaturePad.fromDataURL(signatureDataInput.value);
+      } else {
+        signaturePad.clear();
+      }
+      // signaturePad.clear();  // <--- Diese Zeile muss weg!
+    }
+
+    // Canvas initial anpassen. Ein kleiner Timeout kann helfen,
+    // falls CSS-Dimensionen nicht sofort beim DOMContentLoaded verfügbar sind.
+    setTimeout(resizeCanvas, 100);
+
+    // Optional: Bei Fenstergrößenänderung erneut anpassen.
+    // ACHTUNG: Dies löscht die aktuelle Zeichnung. Nur aktivieren, wenn wirklich nötig.
+    // window.addEventListener('resize', resizeCanvas);
+
+    // Event Listener für den "Löschen"-Button
+    const clearButton = document.getElementById("clear-signature-button");
+    clearButton.addEventListener("click", function () {
+      signaturePad.clear();
+      signatureDataInput.value = ""; // Verstecktes Feld leeren
+    });
+
+    const form = canvas.closest("form");
+    if (form) {
+      form.addEventListener("submit", function (event) {
+        if (!signaturePad.isEmpty()) {
+          if (signatureDataInput) {
+            signatureDataInput.value = signaturePad.toDataURL("image/png");
+          }
+        } else {
+          if (signatureDataInput) {
+            signatureDataInput.value = "";
+          }
+        }
+      });
+    }
+
+    const nextButtons = document.querySelectorAll(".btn-next");
+    nextButtons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        if (!signaturePad.isEmpty()) {
+          signatureDataInput.value = signaturePad.toDataURL("image/png");
+        } else {
+          signatureDataInput.value = "";
+        }
+      });
+    });
+  });
+</script>
+{% endif %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Extract person_or_company select field
+    const person_or_company = document.querySelector("#id_person_or_company");
+
+    // if person_or_company
+    if (person_or_company) {
+      // Extract company name field
+      let company_name_field = document.querySelector("#id_company_name");
+
+      // If company is selected, show company name field
+      if (person_or_company.value == "company") {
+        toggleFieldVisibility(company_name_field, "show");
+      } else {
+        toggleFieldVisibility(company_name_field, "hide");
+      }
+
+      person_or_company.addEventListener("change", function () {
+        // If company is selected, show company name field
+        if (person_or_company.value == "company") {
+          toggleFieldVisibility(company_name_field, "show");
+        } else {
+          toggleFieldVisibility(company_name_field, "hide");
+        }
+      });
+    }
+    // endif person_or_company
+  });
+</script>

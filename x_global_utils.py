@@ -10,18 +10,17 @@ def custom_messages(request, message_type, message_text):
 
     # Error
     if message_type == "error":
-        classes = "error_message_class"
-        return messages.error(request, message_text, extra_tags=classes)
+        classes = "bg-danger"
 
     # Success
     elif message_type == "success":
-        classes = "success_message_class"
-        return messages.success(request, message_text, extra_tags=classes)
+        classes = "bg-success"
 
     # Info
     elif message_type == "info":
-        classes = "info_message_class"
-        return messages.info(request, message_text, extra_tags=classes)
+        classes = "bg-primary"
+
+    return messages.info(request, message_text, extra_tags=classes)
 
 
 def email_is_valid(email: str) -> bool:

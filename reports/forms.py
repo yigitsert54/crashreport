@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from .models import DamageReport, DamageImage
+from datetime import datetime
 
 
 class ReportForm(ModelForm):
@@ -94,6 +95,12 @@ class ReportForm_Step1(ModelForm):
         required=False
     )
 
+    accident_datetime = forms.DateTimeField(
+        input_formats=['%d.%m.%Y %H:%M'],  # deutsches Format erlauben
+        required=False,
+        label="Unfalldatum & -uhrzeit",
+    )
+
     class Meta:
         model = DamageReport
 
@@ -131,6 +138,18 @@ class ReportForm_Step1(ModelForm):
 
 
 class ReportForm_Step2(ModelForm):
+
+    inspection = forms.DateField(
+        required=False,
+        label="HU",
+        input_formats=['%m/%Y'],
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'MM/YYYY',
+            'autocomplete': 'off',
+            'id': 'inspection-month-year'
+        })
+    )
 
     class Meta:
         model = DamageReport

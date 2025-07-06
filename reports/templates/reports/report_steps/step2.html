@@ -1,0 +1,133 @@
+{% load static %}
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC7KR7tSiM_BfzUc8MfGC0WADHVFH8XdNE&libraries=places&callback=initAutocomplete" async defer></script>
+
+<script>
+  function initAutocomplete() {
+    // Feld 1: Adresse
+    const addressInput = document.getElementById("id_address");
+    const addressAutocomplete = new google.maps.places.Autocomplete(addressInput, {
+      fields: ["address_components", "geometry", "icon", "name"],
+    });
+
+    // Feld 2: Unfallort
+    const accidentInput = document.getElementById("id_accident_location");
+    const accidentAutocomplete = new google.maps.places.Autocomplete(accidentInput, {
+      // Hier könntest du andere Optionen festlegen, falls nötig
+      // z.B. die Suche auf Deutschland beschränken
+      componentRestrictions: { country: "de" },
+      fields: ["address_components", "geometry", "icon", "name"],
+    });
+
+    // Optional: Event-Listener für das Adressfeld
+    addressAutocomplete.addListener("place_changed", () => {
+      const place = addressAutocomplete.getPlace();
+      console.log("Ausgewählte Adresse:", place);
+    });
+
+    // Optional: Event-Listener für das Unfallort-Feld
+    accidentAutocomplete.addListener("place_changed", () => {
+      const place = accidentAutocomplete.getPlace();
+      console.log("Ausgewählter Unfallort:", place);
+    });
+  }
+</script>
+
+<div id="details" class="content">
+  <!-- step header -->
+  <div class="content-header mb-4">
+    <h6 class="mb-0">Details</h6>
+    <small>Bitte tragen Sie die Fahrzeug- und Zahlungsdaten ein.</small>
+  </div>
+  <!-- / step header -->
+
+  {% for field in report_form_step_2 %}
+
+  <!-- if checkbox test -->
+  {% if field.widget_type == "checkbox" %}
+  <div class="wizardFormField d-flex align-items-center gap-2">
+    {{field}}
+    <label class="form-label m-0" for="id_{{field.name}}">{{field.label}}</label>
+  </div>
+
+  {% else %}
+
+  <!-- field -->
+  <div class="wizardFormField">
+    <label class="form-label" for="id_{{field.name}}">{{field.label}}</label>
+    {{field}}
+  </div>
+
+  {% endif %}
+  <!-- endif checkbox test -->
+
+  {% endfor %}
+
+  <!-- step buttons -->
+  <div class="col-12 d-flex justify-content-between mt-6">
+    <button class="btn btn-primary btn-prev" type="button">
+      <i class="icon-base bx bx-left-arrow-alt me-sm-2 me-0 scaleX-n1-rtl"></i>
+      <span class="align-middle d-sm-inline-block d-none">Zurück</span>
+    </button>
+    <button class="btn btn-primary btn-next" type="button">
+      <span class="align-middle d-sm-inline-block d-none me-sm-2">Weiter</span>
+      <i class="icon-base bx bx-right-arrow-alt scaleX-n1-rtl"></i>
+    </button>
+  </div>
+  <!-- / step buttons -->
+</div>
+
+<!-- Show/hide fields scripts -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Extract checkbook_exists field
+    const checkbook_exists = document.querySelector("#id_checkbook_exists");
+
+    // if checkbook_exists
+    if (checkbook_exists) {
+      // Extract checkbook upload field
+      let checkbook_upload_field = document.querySelector("#id_checkbook");
+
+      // If checkbook_exists field is checked show upload field
+      if (checkbook_exists.checked) {
+        toggleFieldVisibility(checkbook_upload_field, "show");
+      } else {
+        toggleFieldVisibility(checkbook_upload_field, "hide");
+      }
+
+      checkbook_exists.addEventListener("change", function () {
+        // If company is selected, show company name field
+        if (checkbook_exists.checked) {
+          toggleFieldVisibility(checkbook_upload_field, "show");
+        } else {
+          toggleFieldVisibility(checkbook_upload_field, "hide");
+        }
+      });
+    }
+    // endif checkbook_exists
+  });
+</script>
+
+<!-- Flatpickr CSS & MonthSelect Plugin -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css" />
+
+<!-- Flatpickr JS & MonthSelect Plugin -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    flatpickr("#inspection-month-year", {
+      plugins: [
+        new monthSelectPlugin({
+          shorthand: true, // z.B. Jan, Feb, ...
+          dateFormat: "m/Y", // MM/YYYY
+          altFormat: "F Y", // Januar 2025
+        }),
+      ],
+      allowInput: true,
+      locale: "de",
+    });
+  });
+</script>
