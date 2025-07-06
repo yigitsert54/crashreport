@@ -521,7 +521,7 @@ class AutoixpertAPIHandler:
             "visits": [
                 {
                     "location_name": damage_report.workshop.workshop_name,
-                    "street": f"{workshop_address_data["street"]} {workshop_address_data["street_number"]}" if workshop_address_data["address_corrected"] else workshop_address_data["formatted_address"],
+                    "street": f'{workshop_address_data["street"]} {workshop_address_data["street_number"]}' if workshop_address_data["address_corrected"] else workshop_address_data["formatted_address"],
                     "zip": workshop_address_data["postal_code"] if workshop_address_data["address_corrected"] else "",
                     "city": workshop_address_data["city"] if workshop_address_data["address_corrected"] else "",
                     "date": datetime.now().strftime("%Y-%m-%d"),
@@ -553,7 +553,7 @@ class AutoixpertAPIHandler:
                 "organization_name": damage_report.workshop.workshop_name,
                 "email": damage_report.workshop.email,
                 "phone": damage_report.workshop.phone_number,
-                "street_and_housenumber_or_lockbox": f"{workshop_address_data["street"]} {workshop_address_data["street_number"]}" if workshop_address_data["address_corrected"] else workshop_address_data["formatted_address"],
+                "street_and_housenumber_or_lockbox": f'{workshop_address_data["street"]} {workshop_address_data["street_number"]}' if workshop_address_data["address_corrected"] else workshop_address_data["formatted_address"],
                 "zip": workshop_address_data["postal_code"] if workshop_address_data["address_corrected"] else "",
                 "city": workshop_address_data["city"] if workshop_address_data["address_corrected"] else "",
             },
