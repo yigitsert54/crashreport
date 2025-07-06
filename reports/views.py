@@ -221,7 +221,7 @@ def create_report_initial(request):
             damage_report.first_name = step_1_data["data"]["first_name"]
             damage_report.last_name = step_1_data["data"]["last_name"]
 
-            accident_datetime = datetime.strptime(step_1_data["data"]["accident_datetime"], "%d.%m.%Y %H:%M")
+            accident_datetime = datetime.strptime(step_1_data["data"]["accident_datetime"], "%Y-%m-%d %H:%M")
             if timezone.is_naive(accident_datetime):
                 accident_datetime = timezone.make_aware(accident_datetime)
             # handle accident datetime
